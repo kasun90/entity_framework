@@ -1,0 +1,14 @@
+language: java
+jdk:
+  - oraclejdk8
+  
+env:
+  - CODACY_PROJECT_TOKEN=b5c7d3c527da4c09b5c9ab7b2a511f74
+  
+before_install:
+  - curl -sL https://github.com/jpm4j/jpm4j.installers/raw/master/dist/biz.aQute.jpm.run.jar >jpm4j.jar
+  - java -jar jpm4j.jar -u init
+  - ~/jpm/bin/jpm install com.codacy:codacy-coverage-reporter:assembly
+  
+after_success:
+  - ~/jpm/bin/codacy-coverage-reporter -l Java -r ./spi/target/site/jacoco/jacoco.xml
