@@ -3,7 +3,7 @@ jdk:
   - oraclejdk8
   
 env:
-  - CODACY_PROJECT_TOKEN=b5c7d3c527da4c09b5c9ab7b2a511f74
+  - CODACY_PROJECT_TOKEN=95d0a76a798a4c7dac38ed633f45f823
   
 before_install:
   - curl -sL https://github.com/jpm4j/jpm4j.installers/raw/master/dist/biz.aQute.jpm.run.jar >jpm4j.jar
