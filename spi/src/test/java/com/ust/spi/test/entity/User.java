@@ -4,6 +4,7 @@ import com.ust.spi.Entity;
 import com.ust.spi.test.event.PasswordChanged;
 import com.ust.spi.test.event.UserCreated;
 
+@SuppressWarnings("unused")
 public class User extends Entity {
 
   private String username;
