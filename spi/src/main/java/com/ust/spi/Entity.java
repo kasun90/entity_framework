@@ -25,6 +25,11 @@ public abstract class Entity<E extends Entity> {
     return events;
   }
 
+  public int getEventsCount()
+  {
+    return events.size();
+  }
+  
   public Entity() {
     this.version = 0;
     events = new LinkedList<>();
@@ -33,7 +38,6 @@ public abstract class Entity<E extends Entity> {
   public abstract String getID();
 
   public void applyEvent(Event event) {
-    events.add(event);
     Method method = getApplyMethod(event);
     try {
       method.invoke(this, event);
@@ -41,6 +45,7 @@ public abstract class Entity<E extends Entity> {
       throw new EntityException(e);
     }
     event.setEntityID(getID());
+    events.add(event);
   }
 
   private Method getApplyMethod(Event event) {

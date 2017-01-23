@@ -2,9 +2,6 @@ language: java
 jdk:
   - oraclejdk8
   
-env:
-  - CODACY_PROJECT_TOKEN=95d0a76a798a4c7dac38ed633f45f823
-  
 before_install:
   - curl -sL https://github.com/jpm4j/jpm4j.installers/raw/master/dist/biz.aQute.jpm.run.jar >jpm4j.jar
   - java -jar jpm4j.jar -u init
@@ -12,4 +9,5 @@ before_install:
   
 after_success:
   - ~/jpm/bin/codacy-coverage-reporter -l Java -r ./spi/target/site/jacoco/jacoco.xml
-  - mvn deploy --settings maven/settings.xml
+  - echo "<settings><servers><server><id>maven-s3-release-repo</id><username>\${env.ARTIFACTS_KEY}</username><password>\${env.ARTIFACTS_SECRET}</password></server><server><id>maven-s3-snapshot-repo</id><username>\${env.ARTIFACTS_KEY}</username><password>\${env.ARTIFACTS_SECRET}</password></server></servers></settings>" > ~/settings.xml
+  - mvn deploy --settings ~/settings.xml

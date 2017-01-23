@@ -17,6 +17,7 @@ import com.ust.spi.test.handler.ResetPassword;
 import org.junit.Assert;
 import org.junit.Test;
 
+@SuppressWarnings("PMD")
 public class SpiTest {
 
   @Test
@@ -36,7 +37,7 @@ public class SpiTest {
     Assert.assertEquals("nuwan123", user.getPassword());
   }
 
-  private User setupUser(String username, String password) {
+  private User given_user(String username, String password) {
     User user = new User();
     user.applyEvent(new UserCreated(username, password));
     return user;
@@ -50,6 +51,7 @@ public class SpiTest {
     UserResponse response = registerUser.execute(request);
     User user = repository.getEntity("nuwan");
     
+    Assert.assertEquals(1, user.getEventsCount());
     Assert.assertEquals("", response.getError());
     Assert.assertEquals("nuwan", user.getUsername());
     Assert.assertEquals("ust123", user.getPassword());
@@ -57,7 +59,7 @@ public class SpiTest {
 
   @Test
   public void user_password_change_command_test() throws Exception {
-    User user = setupUser("nuwan", "ust123");
+    User user = given_user("nuwan", "ust123");
     EntityRepository<User> repository = new EntityRepository<>();
     repository.saveEntity(user);
     PasswordResetRequest request = new PasswordResetRequest("nuwan", "nuwan123");
