@@ -10,6 +10,7 @@ package com.ust.spi.test;
  * @author nuwan
  */
 public class UserResponse {
+
   private String error;
 
   public UserResponse(String error) {
@@ -19,5 +20,5 @@ public class UserResponse {
   public String getError() {
     return error;
   }
-  
+
 }

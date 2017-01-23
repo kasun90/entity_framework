@@ -47,10 +47,10 @@ public class SpiTest {
   public void user_create_command_test() throws Exception {
     UserRegisterRequest request = new UserRegisterRequest("nuwan", "ust123");
     EntityRepository<User> repository = new EntityRepository<>();
-    RegisterUser registerUser =  Injector.createInstance(RegisterUser.class,repository);
+    RegisterUser registerUser = Injector.createInstance(RegisterUser.class, repository);
     UserResponse response = registerUser.execute(request);
     User user = repository.getEntity("nuwan");
-    
+
     Assert.assertEquals(1, user.getEventsCount());
     Assert.assertEquals("", response.getError());
     Assert.assertEquals("nuwan", user.getUsername());
@@ -65,7 +65,7 @@ public class SpiTest {
     PasswordResetRequest request = new PasswordResetRequest("nuwan", "nuwan123");
     ResetPassword resetPassword = Injector.createInstance(ResetPassword.class, repository);
     UserResponse response = resetPassword.execute(request);
-    
+
     Assert.assertEquals("", response.getError());
     Assert.assertEquals("nuwan", user.getUsername());
     Assert.assertEquals("nuwan123", user.getPassword());

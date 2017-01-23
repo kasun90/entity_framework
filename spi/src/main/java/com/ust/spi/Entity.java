@@ -25,11 +25,10 @@ public abstract class Entity<E extends Entity> {
     return events;
   }
 
-  public int getEventsCount()
-  {
+  public int getEventsCount() {
     return events.size();
   }
-  
+
   public Entity() {
     this.version = 0;
     events = new LinkedList<>();

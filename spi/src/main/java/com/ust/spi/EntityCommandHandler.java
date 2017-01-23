@@ -14,7 +14,6 @@ public abstract class EntityCommandHandler<C extends Command<R>, R, E extends En
   @Inject
   private EntityRepository<E> entityRepo;
 
-
   @Override
   public abstract R execute(C cmd) throws Exception;
 
