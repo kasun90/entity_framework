@@ -4,8 +4,8 @@ public abstract class Event {
 
   private String entityID;
 
-  protected void setEntityID(String entityID) {
-    this.entityID = entityID;
+  protected void setEntityID(String id) {
+    this.entityID = id;
   }
 
   public String getEntityID() {

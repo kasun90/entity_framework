@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class EntityRepository<E extends Entity> implements EntityViewRespository<E> {
+public class EntityRepository<E extends Entity> implements EntityViewRepository<E> {
 
   private final Map<String, E> mapEntityCache = new ConcurrentHashMap<>();
 

@@ -1,6 +1,6 @@
 package com.ust.spi;
 
-public interface EntityViewRespository<E> {
+public interface EntityViewRepository<E> {
 
   E getEntity(String... keys) throws Exception;
 }

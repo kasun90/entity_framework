@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
  */
 public abstract class Entity<E extends Entity> {
 
-  private long version;
-  private List<Event> events;
-  private static final Map<Class<?>, Map<Class<?>, Method>> map = new ConcurrentHashMap<>();
+  protected long version;
+  protected final List<Event> events;
+  protected static final Map<Class<?>, Map<Class<?>, Method>> map = new ConcurrentHashMap<>();
 
   public long getVersion() {
     return version;
@@ -38,12 +38,12 @@ public abstract class Entity<E extends Entity> {
 
   public void applyEvent(Event event) {
     Method method = getApplyMethod(event);
-    try {
-      method.invoke(this, event);
-    } catch (IllegalAccessException | InvocationTargetException e) {
-      throw new EntityException(e);
-    }
-    event.setEntityID(getID());
+      event.setEntityID(getID());
+      try {
+          method.invoke(this, event);
+      } catch (IllegalAccessException | InvocationTargetException e) {
+          throw new EntityException(e);
+      }
     events.add(event);
   }
 
@@ -62,7 +62,7 @@ public abstract class Entity<E extends Entity> {
 
   private Map<Class<?>, Method> buildApplyMap() {
     Method[] methods = this.getClass().getDeclaredMethods();
-    return Arrays.stream(methods).filter(method -> method.getName().equals("apply"))
+    return Arrays.stream(methods).filter(method -> method.getName().equals("apply")).filter(method -> method.getParameterTypes().length == 1)
         .collect(Collectors.toMap(method -> method.getParameterTypes()[0], Function.identity()));
   }
 
