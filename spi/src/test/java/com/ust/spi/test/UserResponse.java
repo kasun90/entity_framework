@@ -6,19 +6,18 @@
 package com.ust.spi.test;
 
 /**
- *
  * @author nuwan
  */
 public class UserResponse {
 
-  private String error;
+    private String error;
 
-  public UserResponse(String error) {
-    this.error = error;
-  }
+    public UserResponse(String error) {
+        this.error = error;
+    }
 
-  public String getError() {
-    return error;
-  }
+    public String getError() {
+        return error;
+    }
 
 }

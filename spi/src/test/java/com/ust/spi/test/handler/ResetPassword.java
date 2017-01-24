@@ -8,14 +8,14 @@ import com.ust.spi.test.event.PasswordChanged;
 
 public class ResetPassword extends EntityCommandHandler<PasswordResetRequest, UserResponse, User> {
 
-  @Override
-  public UserResponse execute(PasswordResetRequest cmd) throws Exception {
-    User user = getRepository().getEntity(cmd.getUsername());
-    if (user == null) {
-      return new UserResponse("user not found");
+    @Override
+    public UserResponse execute(PasswordResetRequest cmd) throws Exception {
+        User user = getRepository().getEntity(cmd.getUsername());
+        if (user == null) {
+            return new UserResponse("user not found");
+        }
+        user.applyEvent(new PasswordChanged(cmd.getPassword()));
+        return new UserResponse("");
     }
-    user.applyEvent(new PasswordChanged(cmd.getPassword()));
-    return new UserResponse("");
-  }
 
 }

@@ -5,25 +5,25 @@ import com.ust.spi.test.UserResponse;
 
 public class PasswordResetRequest implements Command<UserResponse> {
 
-  private final String username;
-  private final String password;
+    private final String username;
+    private final String password;
 
-  public PasswordResetRequest(String username, String password) {
-    this.username = username;
-    this.password = password;
-  }
+    public PasswordResetRequest(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
 
-  public String getUsername() {
-    return username;
-  }
+    public String getUsername() {
+        return username;
+    }
 
-  public String getPassword() {
-    return password;
-  }
+    public String getPassword() {
+        return password;
+    }
 
-  @Override
-  public String getKey() {
-    return username;
-  }
+    @Override
+    public String getKey() {
+        return username;
+    }
 
 }

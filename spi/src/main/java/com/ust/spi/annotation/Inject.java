@@ -7,9 +7,8 @@ package com.ust.spi.annotation;
  */
 
 /**
- *
  * @author nuwan
  */
 public @interface Inject {
-  
+
 }
