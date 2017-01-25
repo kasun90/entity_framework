@@ -37,7 +37,7 @@ public class SpiTest {
         } catch (Throwable ex) {
             Assert.assertEquals(EntityException.class, ex.getClass());
         }
-        Assert.assertEquals(null, event.getEntityID());
+        Assert.assertEquals(null, event.getEntityId());
     }
 
     @Test

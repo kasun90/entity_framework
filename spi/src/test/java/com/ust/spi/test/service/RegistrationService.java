@@ -9,6 +9,6 @@ import java.util.concurrent.CompletableFuture;
 public interface RegistrationService {
     CompletableFuture<UserResponse> registerUser(UserRegisterRequest request);
 
-    CompletableFuture<UserResponse> resetPassword(PasswordResetRequest reqeust);
+    CompletableFuture<UserResponse> resetPassword(PasswordResetRequest request);
 }
 

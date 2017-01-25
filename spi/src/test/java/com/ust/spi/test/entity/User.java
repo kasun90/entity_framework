@@ -21,7 +21,7 @@ public class User extends Entity {
     }
 
     @Override
-    public String getID() {
+    public String getId() {
         return username;
     }
 

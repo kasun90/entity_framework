@@ -20,8 +20,14 @@ public abstract class MapEntity<I, E extends Entity> extends Entity<E> {
         return items;
     }
 
+    /**
+     * Apply the given {@link Event} to a item in the map of the entity. The entity id of the {@link Event} will be
+     * overwritten with the id
+     * @param key the key of the item contains in the map
+     * @param event the {@link Event} to be applied
+     */
     public void applyEvent(String key, Event event) {
-        event.setEntityID(getID());
+        event.setEntityId(getId());
         Method method = getApplyMethod(event);
         try {
             method.invoke(this, key, event);
@@ -46,8 +52,9 @@ public abstract class MapEntity<I, E extends Entity> extends Entity<E> {
 
     private Map<Class<?>, Method> buildApplyMaps() {
         Method[] methods = this.getClass().getDeclaredMethods();
-        return Arrays.stream(methods).filter(method -> method.getName().equals("apply")).filter(method -> method.getParameterTypes().length == 2).
-                collect(Collectors.toMap(method -> method.getParameterTypes()[1], Function.identity()));
+        return Arrays.stream(methods).filter(method -> method.getName().equals("apply"))
+                .filter(method -> method.getParameterTypes().length == 2)
+                .collect(Collectors.toMap(method -> method.getParameterTypes()[1], Function.identity()));
     }
 
 
