@@ -10,7 +10,7 @@ package com.ust.spi.test;
  */
 public class UserResponse {
 
-    private String error;
+    private final String error;
 
     public UserResponse(String error) {
         this.error = error;
