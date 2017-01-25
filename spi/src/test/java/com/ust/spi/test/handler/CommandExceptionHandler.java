@@ -9,7 +9,7 @@ import com.ust.spi.test.entity.User;
 public class CommandExceptionHandler extends EntityCommandHandler<PasswordResetRequest, UserResponse, User> {
 
     @Override
-    public UserResponse execute(PasswordResetRequest cmd) throws Exception {
+    public UserResponse execute(PasswordResetRequest cmd) {
         throw new CommandException(new CommandException("Ex"));
     }
 

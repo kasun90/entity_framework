@@ -9,7 +9,7 @@ import com.ust.spi.test.event.UserCreated;
 public class RegisterUser extends EntityCommandHandler<UserRegisterRequest, UserResponse, User> {
 
     @Override
-    public UserResponse execute(UserRegisterRequest cmd) throws Exception {
+    public UserResponse execute(UserRegisterRequest cmd) {
 
         User user = getRepository().getEntity(cmd.getUsername());
         if (user != null) {

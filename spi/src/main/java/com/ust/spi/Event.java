@@ -2,13 +2,13 @@ package com.ust.spi;
 
 public abstract class Event {
 
-    private String entityID;
+    private String entityId;
 
-    protected void setEntityID(String entityID) {
-        this.entityID = entityID;
+    protected void setEntityId(String entityId) {
+        this.entityId = entityId;
     }
 
-    public String getEntityID() {
-        return this.entityID;
+    public String getEntityId() {
+        return this.entityId;
     }
 }

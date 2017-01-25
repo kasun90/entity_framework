@@ -9,7 +9,7 @@ import com.ust.spi.test.event.UserCreated;
 @SuppressWarnings("unused")
 public class TestMapEntity extends MapEntity<String, User> {
     @Override
-    public String getID() {
+    public String getId() {
         return "";
     }
 

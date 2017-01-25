@@ -13,7 +13,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * @param <E>
+ * A {@code Entity} provides common information about, and access to a single business entity.
+ * @param <E> the type of parent entity
  */
 public abstract class Entity<E extends Entity> {
 
@@ -38,11 +39,16 @@ public abstract class Entity<E extends Entity> {
         events = new LinkedList<>();
     }
 
-    public abstract String getID();
+    public abstract String getId();
 
+    /**
+     * Apply the given {@link Event} to the entity. The entity id of the {@link Event} will be overwritten with the id
+     * of the {@code Entity}
+     * @param event the {@link Event} to be applied
+     */
     public void applyEvent(Event event) {
         Method method = getApplyMethod(event);
-        event.setEntityID(getID());
+        event.setEntityId(getId());
         try {
             method.invoke(this, event);
         } catch (IllegalAccessException | InvocationTargetException e) {
@@ -67,7 +73,8 @@ public abstract class Entity<E extends Entity> {
 
     private Map<Class<?>, Method> buildApplyMap() {
         Method[] methods = this.getClass().getDeclaredMethods();
-        return Arrays.stream(methods).filter(method -> method.getName().equals("apply")).filter(method -> method.getParameterTypes().length == 1)
+        return Arrays.stream(methods).filter(method -> method.getName().equals("apply"))
+                .filter(method -> method.getParameterTypes().length == 1)
                 .collect(Collectors.toMap(method -> method.getParameterTypes()[0], Function.identity()));
     }
 
