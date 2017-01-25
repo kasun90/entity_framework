@@ -7,6 +7,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>spi</module>
+        <module>web_api</module>
     </modules>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
