@@ -11,11 +11,22 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * A {@code MapEntity} is same as the {@link Entity}. But it is dynamic in nature where you can give key value pair as
+ * an item.
+ *
+ * @param <I> the value type of the map
+ * @param <E> the type of parent entity
+ */
 public abstract class MapEntity<I, E extends Entity> extends Entity<E> {
     private static final Map<Class<?>, Map<Class<?>, Method>> maps = new ConcurrentHashMap<>();
 
-    private Map<String, I> items = new HashMap<>();
+    private final Map<String, I> items = new HashMap<>();
 
+    /**
+     * Gets the items map in this entity.
+     * @return the map of items
+     */
     public Map<String, I> getItems() {
         return items;
     }

@@ -11,6 +11,7 @@ import com.ust.spi.ex.CommandException;
 import com.ust.spi.ex.EntityException;
 import com.ust.spi.test.command.PasswordResetRequest;
 import com.ust.spi.test.command.UserRegisterRequest;
+import com.ust.spi.test.entity.Instrument;
 import com.ust.spi.test.entity.TestMapEntity;
 import com.ust.spi.test.entity.User;
 import com.ust.spi.test.event.EntityExceptionCreationEvent;
@@ -20,15 +21,18 @@ import com.ust.spi.test.event.UserCreated;
 import com.ust.spi.test.handler.CommandExceptionHandler;
 import com.ust.spi.test.handler.RegisterUser;
 import com.ust.spi.test.handler.ResetPassword;
+import com.ust.spi.test.handler.TestHandler;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.lang.reflect.Constructor;
 
 @SuppressWarnings("PMD")
 public class SpiTest {
 
     @Test
     public void entity_exception_test() {
-        Injector injector = new Injector();
+        //Injector injector = new Injector();
         User user = new User();
         EntityExceptionCreationEvent event = new EntityExceptionCreationEvent();
         try {
@@ -48,6 +52,19 @@ public class SpiTest {
             Assert.fail();
         } catch (Throwable ex) {
             Assert.assertEquals(CommandException.class, ex.getClass());
+        }
+    }
+
+    @Test
+    public void coverInjector() throws Exception {
+        Constructor<Injector> constructor = Injector.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        constructor.newInstance();
+        try {
+            Injector.createInstance(TestHandler.class, new EntityRepository<Instrument>());
+            Assert.fail();
+        } catch (Throwable ignored) {
+
         }
     }
 
@@ -96,7 +113,6 @@ public class SpiTest {
         } catch (Throwable ex) {
             Assert.assertEquals(EntityException.class, ex.getClass());
         }
-        Assert.assertEquals(0L, user.getVersion());
         Assert.assertEquals(0, user.getEvents().size());
     }
 

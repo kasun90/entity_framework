@@ -13,29 +13,32 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * A {@code Entity} provides common information about, and access to a single business entity.
+ * A {@code Entity} is the smallest unit of information that system can handle atomically.
+ *
  * @param <E> the type of parent entity
  */
 public abstract class Entity<E extends Entity> {
 
-    protected long version;
     protected final List<Event> events;
     protected static final Map<Class<?>, Map<Class<?>, Method>> map = new ConcurrentHashMap<>();
 
-    public long getVersion() {
-        return version;
-    }
-
+    /**
+     * Gets the {@link Event} list applied to this {@link Entity}.
+     * @return an {@link List} of {@link Event}{@code s}
+     */
     public List<Event> getEvents() {
         return events;
     }
 
+    /**
+     * Gets the count of {@link Event}{@code s} applied to this {@link Entity}.
+     * @return the size of the {@link Event} list
+     */
     public int getEventsCount() {
         return events.size();
     }
 
     public Entity() {
-        this.version = 0;
         events = new LinkedList<>();
     }
 
@@ -44,6 +47,7 @@ public abstract class Entity<E extends Entity> {
     /**
      * Apply the given {@link Event} to the entity. The entity id of the {@link Event} will be overwritten with the id
      * of the {@code Entity}
+     *
      * @param event the {@link Event} to be applied
      */
     public void applyEvent(Event event) {

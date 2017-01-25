@@ -3,7 +3,8 @@ package com.ust.spi;
 import com.ust.spi.annotation.Inject;
 
 /**
- * The {@code EntityCommandHandler} executes commands for the {@link Entity} it belongs to.
+ * The {@code EntityCommandHandler} executes commands for the {@link Entity} it belongs to. This allows only to edit
+ * single {@link Entity}.
  * @param <C> the {@link Command} type executing with the {@code EntityCommandHandler}.
  * @param <R> the response type returns after the execution of the command.
  * @param <E> the {@link Entity} type the {@code EntityCommandHandler} belongs to.
@@ -12,11 +13,15 @@ public abstract class EntityCommandHandler<C extends Command<R>, R, E extends En
         implements CommandHandler<C, R> {
 
     @Inject
-    private EntityRepository<E> entityRepo;
+    private final EntityRepository<E> entityRepo = null;
 
     @Override
     public abstract R execute(C cmd);
 
+    /**
+     * Gets the {@link EntityRepository} bounds to the {@link EntityCommandHandler}.
+     * @return the entity repository
+     */
     protected EntityRepository<E> getRepository() {
         return entityRepo;
     }
