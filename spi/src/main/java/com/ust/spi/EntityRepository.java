@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 /**
  * This responsible for retrieving {@link Entity} from entity server and also act like a temporary caching layer for the
  * commands.
+ *
  * @param <E> the {@link Entity} type
  */
 public class EntityRepository<E extends Entity> implements EntityViewRepository<E> {
@@ -16,6 +17,7 @@ public class EntityRepository<E extends Entity> implements EntityViewRepository<
 
     /**
      * Gets the {@link Entity} by keys.
+     *
      * @param keys keys to get the {@link Entity}
      * @return the {@link Entity} represented by the keys
      */
@@ -27,6 +29,7 @@ public class EntityRepository<E extends Entity> implements EntityViewRepository<
 
     /**
      * Sage the changes to the {@link Entity} server.
+     *
      * @param entity the {@link Entity} to be saved
      */
     public void saveEntity(E entity) {

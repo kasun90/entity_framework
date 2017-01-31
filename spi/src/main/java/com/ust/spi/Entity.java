@@ -24,6 +24,7 @@ public abstract class Entity<E extends Entity> {
 
     /**
      * Gets the {@link Event} list applied to this {@link Entity}.
+     *
      * @return an {@link List} of {@link Event}{@code s}
      */
     public List<Event> getEvents() {
@@ -32,6 +33,7 @@ public abstract class Entity<E extends Entity> {
 
     /**
      * Gets the count of {@link Event}{@code s} applied to this {@link Entity}.
+     *
      * @return the size of the {@link Event} list
      */
     public int getEventsCount() {
@@ -44,6 +46,7 @@ public abstract class Entity<E extends Entity> {
 
     /**
      * Gets the unique identifier of the {@link Entity}.
+     *
      * @return the entity id
      */
     public abstract String getId();

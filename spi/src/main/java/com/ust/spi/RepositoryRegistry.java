@@ -6,8 +6,9 @@ package com.ust.spi;
 public interface RepositoryRegistry {
     /**
      * Gets the entity repository by the {@link Entity} type.
+     *
      * @param entityType the {@link Entity} class type
-     * @param <T> the {@link Entity} class
+     * @param <T>        the {@link Entity} class
      * @return the {@link EntityRepository} of given {@link Entity} type
      */
     <T extends Entity> EntityRepository<T> getRepository(Class<T> entityType);
@@ -31,6 +32,7 @@ public interface RepositoryRegistry {
 
     /**
      * Gets the static instance of the {@link RepositoryRegistry}.
+     *
      * @return the repository registry
      */
     static RepositoryRegistry getInstance() {

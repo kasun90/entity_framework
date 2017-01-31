@@ -9,6 +9,7 @@ public interface EventHandler<E> {
 
     /**
      * The {@link Event} handle callback.
+     *
      * @param event the event to be handled
      */
     void onEvent(E event);

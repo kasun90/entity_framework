@@ -13,7 +13,6 @@ import com.ust.spi.ex.CommandException;
 import com.ust.spi.ex.EntityException;
 import com.ust.spi.test.command.PasswordResetRequest;
 import com.ust.spi.test.command.UserRegisterRequest;
-import com.ust.spi.test.entity.Instrument;
 import com.ust.spi.test.entity.TestMapEntity;
 import com.ust.spi.test.entity.User;
 import com.ust.spi.test.event.EntityExceptionCreationEvent;

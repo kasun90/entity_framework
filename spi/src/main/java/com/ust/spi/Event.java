@@ -10,6 +10,7 @@ public abstract class Event {
 
     /**
      * Sets the id of the {@link Entity} which has the ownership of this {@link Event}.
+     *
      * @param entityId the id of the {@link Entity}
      */
     protected void setEntityId(String entityId) {
@@ -18,6 +19,7 @@ public abstract class Event {
 
     /**
      * Gets the id of the {@link Entity} which has the ownership of this {@link Event}.
+     *
      * @return the id of the {@link Entity}
      */
     public String getEntityId() {

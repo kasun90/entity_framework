@@ -14,8 +14,9 @@ public final class TestRepositoryRegistry implements RepositoryRegistry {
         RepositoryRegistry.instanceData.setInstance(this);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends Entity> EntityRepository<T> getRepository(Class<T> entityType) {
-        return (EntityRepository<T>)entityRepositoryMap.computeIfAbsent(entityType, k -> new EntityRepository<T>());
+        return (EntityRepository<T>) entityRepositoryMap.computeIfAbsent(entityType, k -> new EntityRepository<T>());
     }
 }

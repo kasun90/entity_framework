@@ -25,6 +25,7 @@ public abstract class MapEntity<I, E extends Entity> extends Entity<E> {
 
     /**
      * Gets the items map in this entity.
+     *
      * @return the map of items
      */
     public Map<String, I> getItems() {
@@ -34,7 +35,8 @@ public abstract class MapEntity<I, E extends Entity> extends Entity<E> {
     /**
      * Apply the given {@link Event} to a item in the map of the entity. The entity id of the {@link Event} will be
      * overwritten with the id
-     * @param key the key of the item contains in the map
+     *
+     * @param key   the key of the item contains in the map
      * @param event the {@link Event} to be applied
      */
     public void applyEvent(String key, Event event) {
