@@ -4,6 +4,8 @@ package com.ust.spi;
  * The {@link RepositoryRegistry} provides an interface to get an entity repository by {@link Entity} type.
  */
 public interface RepositoryRegistry {
+    RepositoryRegistryData instanceData = new RepositoryRegistryData();
+
     /**
      * Gets the entity repository by the {@link Entity} type.
      *
@@ -27,8 +29,6 @@ public interface RepositoryRegistry {
             this.instance = instance;
         }
     }
-
-    RepositoryRegistryData instanceData = new RepositoryRegistryData();
 
     /**
      * Gets the static instance of the {@link RepositoryRegistry}.
