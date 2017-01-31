@@ -42,6 +42,10 @@ public abstract class Entity<E extends Entity> {
         events = new LinkedList<>();
     }
 
+    /**
+     * Gets the unique identifier of the {@link Entity}.
+     * @return the entity id
+     */
     public abstract String getId();
 
     /**

@@ -6,5 +6,10 @@ package com.ust.spi;
  * @param <R> the related {@link Entity} type
  */
 public interface Command<R> {
+
+    /**
+     * Gets the key of the {@link Command}.
+     * @return the key
+     */
     String getKey();
 }

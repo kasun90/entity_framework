@@ -7,5 +7,10 @@ package com.ust.spi;
  */
 public interface CommandHandler<C extends Command<R>, R> {
 
+    /**
+     * Executes the given {@link Command}.
+     * @param cmd the {@link Command} to be executed
+     * @return the result of the execution
+     */
     R execute(C cmd);
 }

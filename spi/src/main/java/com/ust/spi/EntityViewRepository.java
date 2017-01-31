@@ -7,5 +7,10 @@ package com.ust.spi;
  */
 public interface EntityViewRepository<E> {
 
+    /**
+     * Gets the {@link Entity} for the given keys.
+     * @param keys the keys for acquiring the {@link Entity}
+     * @return the {@link Entity}
+     */
     E getEntity(String... keys);
 }
