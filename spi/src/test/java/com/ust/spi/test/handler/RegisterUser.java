@@ -1,6 +1,7 @@
 package com.ust.spi.test.handler;
 
 import com.ust.spi.EntityCommandHandler;
+import com.ust.spi.EntityViewRepository;
 import com.ust.spi.test.UserResponse;
 import com.ust.spi.test.command.UserRegisterRequest;
 import com.ust.spi.test.entity.User;
@@ -18,7 +19,8 @@ public class RegisterUser extends EntityCommandHandler<UserRegisterRequest, User
         user = new User();
         user.applyEvent(new UserCreated(cmd.getUsername(), cmd.getPassword()));
         getRepository().saveEntity(user);
-        return new UserResponse("");
+        EntityViewRepository<User> viewRepository = getViewRepository(User.class);
+        return new UserResponse(viewRepository.getEntity(cmd.getKey()).getId());
     }
 
 }
