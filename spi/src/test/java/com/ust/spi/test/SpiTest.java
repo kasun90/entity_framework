@@ -76,7 +76,7 @@ public class SpiTest {
     }
 
     @Test
-    public void mapEntityItemEventTest() {
+    public void mapEntityItemEventTest() throws Exception {
         TestMapEntity mapEntity = new TestMapEntity();
         mapEntity.applyEvent("1", new PasswordChanged(""));
         Assert.assertEquals(1, mapEntity.getItems().size());
