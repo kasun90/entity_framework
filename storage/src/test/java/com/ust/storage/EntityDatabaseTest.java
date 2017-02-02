@@ -1,6 +1,7 @@
 package com.ust.storage;
 
 import com.ust.storage.ex.EntityCompatibilityException;
+import com.ust.storage.ex.EntityViewException;
 import com.ust.storage.view.EntityView;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
@@ -51,6 +52,21 @@ public class EntityDatabaseTest {
             System.out.println("key " + result.getKey() + " val " + result.getValue());
             result.next();
         }
+    }
+
+    @Test
+    public void first_entity_view_insert_version_check_test() throws Exception {
+
+        EntityView entityView = new EntityView(1, 0, "com.ust.User", "1", "entity1",
+            new LinkedList<>(Arrays.asList("event1", "event2", "event3")));
+        try {
+            db.put(entityView);
+        } catch (Exception ex) {
+            assertEquals(EntityViewException.class, ex.getClass());
+            return;
+        }
+
+        Assert.fail("this test should throw a exception");
     }
 
     @Test
