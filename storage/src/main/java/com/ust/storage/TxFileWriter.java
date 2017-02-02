@@ -1,7 +1,5 @@
 package com.ust.storage;
 
-import java.util.Collection;
-
 public interface TxFileWriter {
 
     void init() throws Exception;;

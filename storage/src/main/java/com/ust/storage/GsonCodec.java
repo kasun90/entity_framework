@@ -3,7 +3,7 @@ package com.ust.storage;
 import com.google.gson.Gson;
 
 public class GsonCodec{
-    ThreadLocal<Gson> threadGson = new ThreadLocal<>();
+    private ThreadLocal<Gson> threadGson = new ThreadLocal<>();
     
     private Gson getGson()
     {

@@ -110,10 +110,10 @@ public class EntityDatabase {
         List<EventView> list = events.stream()
             .map(event -> new EventView(event, "", System.currentTimeMillis(), System.currentTimeMillis()))
             .collect(Collectors.toList());
-
+        long seq = startSeq;
         for (EventView eventView : list) {
-            startSeq++;
-            putEvent(batch, eventView, entityView.getEntityType(), entityView.getId(), String.format("%020d", startSeq));
+            seq++;
+            putEvent(batch, eventView, entityView.getEntityType(), entityView.getId(), String.format("%020d", seq));
         }
     }
 

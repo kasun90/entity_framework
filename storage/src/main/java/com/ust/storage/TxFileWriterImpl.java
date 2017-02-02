@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 
 public class TxFileWriterImpl implements TxFileWriter {
 
-    String fileName;
-    FileOutputStream outputStream;
+    private String fileName;
+    private FileOutputStream outputStream;
     
     public static final int RS = 30;
     public static final int US = 31;
@@ -87,10 +87,11 @@ public class TxFileWriterImpl implements TxFileWriter {
     }
 
     private int searchRS(byte[] data, int length) {
-        while (length > 0) {
-            int b = data[--length];
+        int len = length;
+        while (len > 0) {
+            int b = data[--len];
             if (b == 30) {
-                return length + 1;
+                return len + 1;
             }
         }
         return -1;

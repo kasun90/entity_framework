@@ -1,10 +1,11 @@
 package com.ust.storage.view;
 
 public class EventView {
-    String event;
-    String changeBy;
-    long txTime;
-    long businessDate;
+    
+    private String event;
+    private String changeBy;
+    private long txTime;
+    private long businessDate;
 
     public EventView(String event, String changeBy, long txTime, long businessDate) {
         this.event = event;
