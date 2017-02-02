@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.ust</groupId>
         <artifactId>entityframework</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>0.0.0</version>
     </parent>
     <artifactId>storage</artifactId>
     <packaging>jar</packaging>

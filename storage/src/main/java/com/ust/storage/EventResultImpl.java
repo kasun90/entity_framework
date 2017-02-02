@@ -6,9 +6,9 @@ import org.rocksdb.RocksIterator;
 
 public class EventResultImpl implements EventResultSet {
 
-    private RocksIterator ite;
-    private String startKey;
-    private GsonCodec codec;
+    private final RocksIterator ite;
+    private final String startKey;
+    private final GsonCodec codec;
 
     public EventResultImpl(RocksIterator ite, GsonCodec codec, String startKey) throws UnsupportedEncodingException {
         this.startKey = startKey;
