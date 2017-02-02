@@ -122,3 +122,4 @@ $RECYCLE.BIN/
 .idea/
 *.iml
 /spi/nbproject/
+/storage/nbproject/
