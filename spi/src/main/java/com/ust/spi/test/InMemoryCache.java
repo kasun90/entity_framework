@@ -1,4 +1,7 @@
-package com.ust.spi;
+package com.ust.spi.test;
+
+import com.ust.spi.Cache;
+import com.ust.spi.MutableCache;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

@@ -1,6 +1,7 @@
 package com.ust.spi;
 
-import org.junit.Assert;
+import com.ust.spi.test.InMemoryCache;
+import com.ust.spi.test.InMemoryCacheRegistry;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -11,9 +12,9 @@ public class InMemoryCacheRegistryTest {
         InMemoryCacheRegistry registry = new InMemoryCacheRegistry();
         InMemoryCache cache = new InMemoryCache();
         cache.put("rest", "VAR");
-        CacheRegistry.getInstance().putCache("test", cache);
+        registry.putCache("test", cache);
 
-        Assert.assertEquals("VAR", CacheRegistry.getInstance().getCache("test").get("rest"));
+        assertEquals("VAR", registry.getCache("test").get("rest"));
     }
 
     @Test
@@ -21,12 +22,12 @@ public class InMemoryCacheRegistryTest {
         InMemoryCacheRegistry registry = new InMemoryCacheRegistry();
         InMemoryCache cache = new InMemoryCache();
         cache.put("rest", "VAR");
-        CacheRegistry.getInstance().putCache("test", cache);
+        registry.putCache("test", cache);
 
-        Assert.assertEquals("VAR", CacheRegistry.getInstance().getCache("test").get("rest"));
+        assertEquals("VAR", registry.getCache("test").get("rest"));
 
-        CacheRegistry.getInstance().removeCache("test");
-        Assert.assertNull(CacheRegistry.getInstance().getCache("test").get("rest"));
+        registry.removeCache("test");
+        assertNull(registry.getCache("test").get("rest"));
     }
 
 }

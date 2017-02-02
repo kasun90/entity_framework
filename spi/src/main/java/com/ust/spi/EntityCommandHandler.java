@@ -14,7 +14,7 @@ import java.lang.reflect.ParameterizedType;
  */
 public abstract class EntityCommandHandler<C extends Command<R>, R, E extends Entity>
         implements CommandHandler<C, R> {
-    String entityType;
+    private String entityType;
 
     public EntityCommandHandler() {
         ParameterizedType genericSuperclass = (ParameterizedType) this.getClass().getGenericSuperclass();
@@ -22,7 +22,13 @@ public abstract class EntityCommandHandler<C extends Command<R>, R, E extends En
     }
 
     @Inject
-    private final EntityRepository<E> entityRepo = null;
+    private EntityRepository<E> entityRepo;
+
+    @Inject
+    private RepositoryRegistry repositoryRegistry ;
+
+    @Inject
+    private CacheRegistry cacheRegistry;
 
     @Override
     public abstract R execute(C cmd);
@@ -44,7 +50,7 @@ public abstract class EntityCommandHandler<C extends Command<R>, R, E extends En
      * @return the entity view repository
      */
     protected <T extends Entity> EntityViewRepository<T> getViewRepository(Class<T> entityType) {
-        return RepositoryRegistry.getInstance().getRepository(entityType);
+        return repositoryRegistry.getRepository(entityType);
     }
 
     /**
@@ -53,7 +59,7 @@ public abstract class EntityCommandHandler<C extends Command<R>, R, E extends En
      * @return the mutable cache
      */
     protected MutableCache getCache(String entityId) {
-        return ((MutableCache) CacheRegistry.getInstance().getCache(entityType + ":" + entityId));
+        return ((MutableCache) cacheRegistry.getCache(entityType + ":" + entityId));
     }
 
     /**
@@ -63,7 +69,7 @@ public abstract class EntityCommandHandler<C extends Command<R>, R, E extends En
      * @return the cache
      */
     protected Cache getCache(Class<? extends Entity> entityType, String entityId) {
-        return CacheRegistry.getInstance().getCache(entityType.getName() + ":" + entityId);
+        return cacheRegistry.getCache(entityType.getName() + ":" + entityId);
     }
 
     /**
@@ -72,6 +78,6 @@ public abstract class EntityCommandHandler<C extends Command<R>, R, E extends En
      * @return the cache
      */
     protected Cache getCache(Class<? extends Entity> entityType) {
-        return CacheRegistry.getInstance().getCache(entityType.getName() + ":" + entityType.getName());
+        return cacheRegistry.getCache(entityType.getName() + ":" + entityType.getName());
     }
 }

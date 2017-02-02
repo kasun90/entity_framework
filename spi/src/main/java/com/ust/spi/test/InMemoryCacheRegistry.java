@@ -1,4 +1,7 @@
-package com.ust.spi;
+package com.ust.spi.test;
+
+import com.ust.spi.Cache;
+import com.ust.spi.CacheRegistry;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -7,11 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * The registry which contains in-memory cashes.
  */
 public final class InMemoryCacheRegistry implements CacheRegistry {
-    Map<String, Cache> caches = new ConcurrentHashMap<>();
-
-    public InMemoryCacheRegistry() {
-        CacheRegistry.instanceData.setInstance(this);
-    }
+    private Map<String, Cache> caches = new ConcurrentHashMap<>();
 
     @Override
     public Cache getCache(String id) {
