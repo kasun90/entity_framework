@@ -70,6 +70,21 @@ public class EntityDatabaseTest {
     }
 
     @Test
+    public void entity_view_insert_with_empty_events_test() throws Exception {
+
+        EntityView entityView = new EntityView(1, 0, "com.ust.User", "1", "entity1",
+            new LinkedList<>());
+        try {
+            db.put(entityView);
+        } catch (Exception ex) {
+            assertEquals(EntityViewException.class, ex.getClass());
+            return;
+        }
+
+        Assert.fail("this test should throw a exception");
+    }
+
+    @Test
     public void entity_view_continues_write_event_sequence_test() throws Exception {
 
         EntityView entityView = new EntityView(0, 0, "com.ust.User", "1", "entity1",
