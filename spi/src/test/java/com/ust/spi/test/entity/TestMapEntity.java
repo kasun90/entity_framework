@@ -1,7 +1,9 @@
 package com.ust.spi.test.entity;
 
 import com.ust.spi.MapEntity;
+
 import com.ust.spi.test.EntityItem;
+
 import com.ust.spi.test.event.UserCreated;
 
 @SuppressWarnings("unused")
