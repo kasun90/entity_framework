@@ -5,10 +5,7 @@
  */
 package com.ust.spi.test;
 
-import com.ust.spi.EntityRepository;
-import com.ust.spi.Injector;
-import com.ust.spi.RepositoryRegistry;
-import com.ust.spi.TestRepositoryRegistry;
+import com.ust.spi.*;
 import com.ust.spi.ex.CommandException;
 import com.ust.spi.ex.EntityException;
 import com.ust.spi.test.command.PasswordResetRequest;
@@ -184,5 +181,39 @@ public class SpiTest {
         Assert.assertEquals("", response.getError());
         Assert.assertEquals("nuwan", user.getUsername());
         Assert.assertEquals("nuwan123", user.getPassword());
+    }
+
+    public static class ownCacheTestClass1 extends EntityCommandHandler<UserRegisterRequest, UserResponse, User> {
+
+        @Override
+        public UserResponse execute(UserRegisterRequest cmd) {
+            MutableCache cache = getCache(cmd.getUsername());
+            cache.put("test", "Go");
+
+            ((MutableCache) getCache(User.class)).put("lot","BOT");
+            return null;
+        }
+    }
+
+    public static class ownCacheTestClass2 extends EntityCommandHandler<UserRegisterRequest, UserResponse, User> {
+
+        @Override
+        public UserResponse execute(UserRegisterRequest cmd) {
+            Assert.assertEquals("Go", getCache(cmd.getUsername()).get("test"));
+
+            Assert.assertEquals("Go", getCache(User.class, cmd.getUsername()).get("test"));
+            Assert.assertEquals("BOT", getCache(User.class).get("lot"));
+            return null;
+        }
+    }
+
+    @Test
+    public void ownCacheTest() throws Exception {
+        InMemoryCacheRegistry reg = new InMemoryCacheRegistry();
+
+        EntityCommandHandler<UserRegisterRequest, UserResponse, User> resetPassword = Injector.createInstance(ownCacheTestClass1.class);
+        resetPassword.execute(new UserRegisterRequest("test", "best"));
+        resetPassword = Injector.createInstance(ownCacheTestClass2.class);
+        resetPassword.execute(new UserRegisterRequest("test", "best"));
     }
 }

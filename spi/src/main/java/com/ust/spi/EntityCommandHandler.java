@@ -2,6 +2,8 @@ package com.ust.spi;
 
 import com.ust.spi.annotation.Inject;
 
+import java.lang.reflect.ParameterizedType;
+
 /**
  * The {@code EntityCommandHandler} executes commands for the {@link Entity} it belongs to. This allows only to edit
  * single {@link Entity}.
@@ -12,6 +14,12 @@ import com.ust.spi.annotation.Inject;
  */
 public abstract class EntityCommandHandler<C extends Command<R>, R, E extends Entity>
         implements CommandHandler<C, R> {
+    String entityType;
+
+    public EntityCommandHandler() {
+        ParameterizedType genericSuperclass = (ParameterizedType) this.getClass().getGenericSuperclass();
+        entityType = ((Class) genericSuperclass.getActualTypeArguments()[2]).getName();
+    }
 
     @Inject
     private final EntityRepository<E> entityRepo = null;
@@ -37,5 +45,33 @@ public abstract class EntityCommandHandler<C extends Command<R>, R, E extends En
      */
     protected <T extends Entity> EntityViewRepository<T> getViewRepository(Class<T> entityType) {
         return RepositoryRegistry.getInstance().getRepository(entityType);
+    }
+
+    /**
+     * Gets the cache by the entity identifier.
+     * @param entityId the entity id
+     * @return the mutable cache
+     */
+    protected MutableCache getCache(String entityId) {
+        return ((MutableCache) CacheRegistry.getInstance().getCache(entityType + ":" + entityId));
+    }
+
+    /**
+     * Gets the readonly cache by the entity type and the entity identifier.
+     * @param entityType the entity type
+     * @param entityId the entity id
+     * @return the cache
+     */
+    protected Cache getCache(Class<? extends Entity> entityType, String entityId) {
+        return CacheRegistry.getInstance().getCache(entityType.getName() + ":" + entityId);
+    }
+
+    /**
+     * Gets the common cache related to the entity type by the entity type.
+     * @param entityType the entity type
+     * @return the cache
+     */
+    protected Cache getCache(Class<? extends Entity> entityType) {
+        return CacheRegistry.getInstance().getCache(entityType.getName() + ":" + entityType.getName());
     }
 }
