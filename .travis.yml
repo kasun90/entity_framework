@@ -6,7 +6,8 @@ before_install:
   - curl -sL https://github.com/jpm4j/jpm4j.installers/raw/master/dist/biz.aQute.jpm.run.jar >jpm4j.jar
   - java -jar jpm4j.jar -u init
   - ~/jpm/bin/jpm install com.codacy:codacy-coverage-reporter:assembly
-  
+  - mvn versions:set versions:commit -DnewVersion="1.0"
+
 after_success:
   - ~/jpm/bin/codacy-coverage-reporter -l Java -r ./spi/target/site/jacoco/jacoco.xml
   - echo "<settings><servers><server><id>maven-s3-release-repo</id><username>\${env.ARTIFACTS_KEY}</username><password>\${env.ARTIFACTS_SECRET}</password></server><server><id>maven-s3-snapshot-repo</id><username>\${env.ARTIFACTS_KEY}</username><password>\${env.ARTIFACTS_SECRET}</password></server></servers></settings>" > ~/settings.xml
