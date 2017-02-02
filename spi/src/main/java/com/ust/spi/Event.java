@@ -7,6 +7,11 @@ package com.ust.spi;
 public abstract class Event {
 
     private String entityId;
+    private long time;
+
+    public Event() {
+        this.time = System.currentTimeMillis();
+    }
 
     /**
      * Sets the id of the {@link Entity} which has the ownership of this {@link Event}.
@@ -24,5 +29,9 @@ public abstract class Event {
      */
     public String getEntityId() {
         return this.entityId;
+    }
+
+    public long getTime() {
+        return time;
     }
 }

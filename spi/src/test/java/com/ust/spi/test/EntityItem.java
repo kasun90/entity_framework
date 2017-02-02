@@ -2,10 +2,11 @@ package com.ust.spi.test;
 
 import com.ust.spi.test.event.PasswordChanged;
 
+@SuppressWarnings("PMD")
 public class EntityItem {
 
-    String name;
-    String password;
+    private String name;
+    private String password;
 
     private void apply(PasswordChanged event) {
         name = event.getEntityId();
