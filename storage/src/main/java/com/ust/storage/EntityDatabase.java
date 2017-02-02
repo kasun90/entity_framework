@@ -40,7 +40,8 @@ public class EntityDatabase {
 
     public void put(EntityView entityView) throws Exception {
         if (entityView.getEvents().isEmpty()) {
-            return;
+            throw new EntityViewException("emtpy events list received for entity type {1} and id {2}",
+                entityView.getVersion(), entityView.getEntityType(), entityView.getId());
         }
         EntityView existingView = getEntityView(entityView.getEntityType(), entityView.getId());
         if (existingView == null) {
@@ -55,9 +56,7 @@ public class EntityDatabase {
                 entityView.getEntityType(), entityView.getId());
         } else if ((existingView.getVersion() + 1) != entityView.getVersion()) {
             throw new ConcurrentModificationException("version mismatched");
-        }
-        else
-        {
+        } else {
             entityView.setEventSeq(existingView.getEventSeq());
         }
 
@@ -70,18 +69,16 @@ public class EntityDatabase {
         endBatch(writeBatch);
     }
 
-    public EventResultSet queryEvents(String entityType,String entityID,long startSeq) throws UnsupportedEncodingException
-    {
-         RocksIterator ite = db.newIterator(columnFamilyHandleList.get(1));
-         return new EventResultImpl(ite,gsonCodec, Arrays.asList(entityType,entityID,String.format("%020d",startSeq)).stream()
-             .collect(Collectors.joining(":")));
+    public EventResultSet queryEvents(String entityType, String entityID, long startSeq) throws UnsupportedEncodingException {
+        RocksIterator ite = db.newIterator(columnFamilyHandleList.get(1));
+        return new EventResultImpl(ite, gsonCodec, Arrays.asList(entityType, entityID, String.format("%020d", startSeq)).stream()
+            .collect(Collectors.joining(":")));
     }
-    
-    public void close()
-    {
-         db.close();
+
+    public void close() {
+        db.close();
     }
-   
+
     private EntityView getEntityView(String... keys) throws RocksDBException, UnsupportedEncodingException {
         String compositeKey = Arrays.asList(keys).stream().collect(Collectors.joining(":"));
         return get(EntityView.class, compositeKey);
@@ -126,6 +123,5 @@ public class EntityDatabase {
     private void endBatch(WriteBatch batch) throws RocksDBException {
         db.write(writeOptions, batch);
     }
-    
-    
+
 }
