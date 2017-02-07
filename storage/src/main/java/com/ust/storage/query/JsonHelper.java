@@ -32,6 +32,7 @@ public class JsonHelper {
         return false;
     }
     
+    @SuppressWarnings("PMD")
      public static int compare(JsonElement left, JsonElement right) {
         if (left == null && right == null) {
             return 0;
