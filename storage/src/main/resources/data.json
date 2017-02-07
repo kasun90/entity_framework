@@ -1,0 +1,8 @@
+{ "city" : "GALLE","pop" : 1, "state" : "MA", "_id" : "01001" }
+{ "city" : "COLOMBO","pop" : 1, "state" : "MA", "_id" : "01007" }
+{ "city" : "GALLE", "pop" : 1, "state" : "MA", "_id" : "01002" }
+{ "city" : "NUGEGODA", "pop" : 4, "state" : "MA", "_id" : "01011" }
+{ "city" : "GALLE", "pop" : 2, "state" : "MA", "_id" : "01005" }
+{ "city" : "COLOMBO", "pop" : 3, "state" : "MA", "_id" : "01008" }
+{ "city" : "NUGEGODA",  "pop" : 2, "state" : "MA", "_id" : "01012" }
+{ "city" : "COLOMBO","pop" : 2, "state" : "MA", "_id" : "01010" }
