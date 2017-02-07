@@ -24,7 +24,7 @@ import org.rocksdb.RocksDBException;
 public class JsonStreamTest {
 
     private JsonStream jsonStream;
-    private List<JsonObject> jsonList = new LinkedList<>();
+    private final List<JsonObject> jsonList = new LinkedList<>();
 
     @Before
     public void setUp() throws RocksDBException, IOException {

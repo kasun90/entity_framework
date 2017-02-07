@@ -26,10 +26,8 @@ public class JsonHelper {
             return false;
         } else if (el.isJsonPrimitive()) {
             return el.getAsString().equals(String.valueOf(value));
-        } else if (el.isJsonObject()) {
-            if (value instanceof JsonObject) {
+        } else if (el.isJsonObject() && (value instanceof JsonObject)) {
                 return el.getAsJsonObject().toString().equals(((JsonObject) value).toString());
-            }
         }
         return false;
     }

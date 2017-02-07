@@ -14,12 +14,8 @@ import java.lang.reflect.ParameterizedType;
  */
 public abstract class EntityCommandHandler<C extends Command<R>, R, E extends Entity>
         implements CommandHandler<C, R> {
+    
     private String entityType;
-
-    public EntityCommandHandler() {
-        ParameterizedType genericSuperclass = (ParameterizedType) this.getClass().getGenericSuperclass();
-        entityType = ((Class) genericSuperclass.getActualTypeArguments()[2]).getName();
-    }
 
     @Inject
     private EntityRepository<E> entityRepo;
@@ -29,6 +25,11 @@ public abstract class EntityCommandHandler<C extends Command<R>, R, E extends En
 
     @Inject
     private CacheRegistry cacheRegistry;
+    
+    public EntityCommandHandler() {
+        ParameterizedType genericSuperclass = (ParameterizedType) this.getClass().getGenericSuperclass();
+        entityType = ((Class) genericSuperclass.getActualTypeArguments()[2]).getName();
+    }
 
     @Override
     public abstract R execute(C cmd);

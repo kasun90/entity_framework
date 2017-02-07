@@ -59,14 +59,15 @@ public class JsonStream {
 
     public static final class Keys {
 
-        JsonObject json;
-        String[] keys;
+        private JsonObject json;
+        private String[] keys;
 
         public Keys(JsonObject json, String... keys) {
             this.json = json;
             this.keys = keys;
         }
 
+        @Override
         public String toString() {
             return Arrays.asList(keys).stream().map(key -> getValue(key)).collect(Collectors.joining(":"));
         }
@@ -114,7 +115,7 @@ public class JsonStream {
 
     public static final class JsonFieldComparator implements Comparator<JsonObject> {
 
-        String field;
+        private String field;
 
         public JsonFieldComparator(String field) {
             this.field = field;
