@@ -26,10 +26,10 @@ public abstract class MapEntity<I, E extends Entity> extends Entity<E> {
     private final Class<I> itemClazz;
 
     public MapEntity(Class<I> itemClazz) {
-      this.itemClazz = itemClazz;
+        this.itemClazz = itemClazz;
     }
-    
-    
+
+
     /**
      * Gets the items map in this entity.
      *
@@ -39,11 +39,14 @@ public abstract class MapEntity<I, E extends Entity> extends Entity<E> {
         return items;
     }
 
-    public Stream<I> stream()
-    {
+    /**
+     * Returns a sequential {@code Stream} with this collection as its source.
+     * @return a sequential {@code Stream} over the elements in this collection
+     */
+    public Stream<I> stream() {
         return items.values().stream();
     }
-    
+
     /**
      * Apply the given {@link Event} to a item in the map of the entity. The entity id of the {@link Event} will be
      * overwritten with the id
@@ -51,9 +54,9 @@ public abstract class MapEntity<I, E extends Entity> extends Entity<E> {
      * @param key   the key of the item contains in the map
      * @param event the {@link Event} to be applied
      */
-    public void applyEvent(String key, Event event)  throws Exception{
-        event.setEntityId(getId()); 
-        I item = items.computeIfAbsent(key, k->createInstance());
+    public void applyEvent(String key, Event event) {
+        event.setEntityId(getId());
+        I item = items.computeIfAbsent(key, k -> createInstance());
         Method method = getApplyMethod(event);
         try {
             method.invoke(item, event);
@@ -63,15 +66,14 @@ public abstract class MapEntity<I, E extends Entity> extends Entity<E> {
         events.add(event);
     }
 
-    private I createInstance()
-    {
+    private I createInstance() {
         try {
             return itemClazz.newInstance();
         } catch (InstantiationException | IllegalAccessException ex) {
             throw new EntityException(ex);
         }
     }
-    
+
     private Method getApplyMethod(Event event) {
         Map<Class<?>, Method> classMethodMap = maps.computeIfAbsent(itemClazz, aClass -> buildApplyMaps(itemClazz));
         Method method = classMethodMap.get(event.getClass());

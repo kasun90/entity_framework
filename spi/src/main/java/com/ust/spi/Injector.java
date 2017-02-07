@@ -10,9 +10,45 @@ import java.lang.reflect.Type;
 /**
  * Utility class for the test case {@link EntityCommandHandler} creation.
  */
-public final class Injector {
-    private Injector() {
+public class Injector {
+    RepositoryRegistry repositoryRegistry;
+    CacheRegistry cacheRegistry;
 
+    public Injector(RepositoryRegistry repositoryRegistry, CacheRegistry cacheRegistry) {
+        setRepositoryRegistry(repositoryRegistry);
+        setCacheRegistry(this.cacheRegistry = cacheRegistry);
+    }
+
+    /**
+     * Sets the repository registry to inject.
+     * @param repositoryRegistry the repository registry
+     */
+    public void setRepositoryRegistry(RepositoryRegistry repositoryRegistry) {
+        this.repositoryRegistry = repositoryRegistry;
+    }
+
+    /**
+     * Sets the cache registry to inject.
+     * @param cacheRegistry the cache registry
+     */
+    public void setCacheRegistry(CacheRegistry cacheRegistry) {
+        this.cacheRegistry = cacheRegistry;
+    }
+
+    /**
+     * Gets the repository registry.
+     * @return the repository registry
+     */
+    public RepositoryRegistry getRepositoryRegistry() {
+        return repositoryRegistry;
+    }
+
+    /**
+     * Gets the cache registry.
+     * @return the cache registry
+     */
+    public CacheRegistry getCacheRegistry() {
+        return cacheRegistry;
     }
 
     /**
@@ -24,23 +60,30 @@ public final class Injector {
      * @return the created {@link EntityCommandHandler}
      */
     @SuppressWarnings("unchecked")
-    public static <T extends EntityCommandHandler> T createInstance(Class<T> cls) {
+    public <T extends EntityCommandHandler> T createInstance(Class<T> cls) {
         try {
-            Field field = cls.getSuperclass().getDeclaredField("entityRepo");
-            field.setAccessible(true);
+            Field entityRepoField = EntityCommandHandler.class.getDeclaredField("entityRepo");
+            entityRepoField.setAccessible(true);
+
+            Field repositoryRegistryField = EntityCommandHandler.class.getDeclaredField("repositoryRegistry");
+            repositoryRegistryField.setAccessible(true);
+
+            Field cacheRegistryField = EntityCommandHandler.class.getDeclaredField("cacheRegistry");
+            cacheRegistryField.setAccessible(true);
+
             T handler = cls.newInstance();
             Type genericFieldType = handler.getClass().getGenericSuperclass();
             ParameterizedType type = (ParameterizedType) genericFieldType;
             Class entityTypeClass = (Class) type.getActualTypeArguments()[2];
-            field.set(handler, RepositoryRegistry.getInstance().getRepository(entityTypeClass));
+            entityRepoField.set(handler, repositoryRegistry.getRepository(entityTypeClass));
+            repositoryRegistryField.set(handler, repositoryRegistry);
+            cacheRegistryField.set(handler, cacheRegistry);
             return handler;
         } catch (NoSuchFieldException | IllegalAccessException | InstantiationException e) {
-            throw new CommandException(e);
+            throw new CommandException(e); // $COVERAGE-IGNORE$
         }
-
-
     }
-    
+
     /**
      * This creates an instance of a {@link EntityEventHandler} injected the {@link EntityRepository} as it
      * repository.
@@ -49,7 +92,7 @@ public final class Injector {
      * @param <T> the {@link EntityEventHandler} type for creating new instance.
      * @return the created {@link EntityEventHandler}
      */
-    public static <T extends EntityEventHandler> T createListenerInstance(Class<T> cls, EntityRepository repo) {
+    public <T extends EntityEventHandler> T createListenerInstance(Class<T> cls, EntityRepository repo) {
         try {
             Field field = cls.getSuperclass().getDeclaredField("entityRepo");
             field.setAccessible(true);
