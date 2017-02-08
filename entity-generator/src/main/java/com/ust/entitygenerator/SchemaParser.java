@@ -7,10 +7,7 @@ import com.ust.spi.Event;
 import com.ust.spi.MapEntity;
 
 import javax.lang.model.element.Modifier;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.util.*;
@@ -56,30 +53,31 @@ public class SchemaParser {
         reader = new BufferedReader(new InputStreamReader(stream));
     }
 
-    public void writeTo(Path entityDirectory, Path eventDirectory, Path commandDirectory, Path enumDirectory) throws IOException, ClassNotFoundException {
+    public void writeTo(String entityDirectory, String eventDirectory, String commandDirectory, String enumDirectory) throws IOException, ClassNotFoundException {
         read();
+        String srcPath = "/src/main/java";
         if (entityBuilder != null) {
             JavaFile file = JavaFile.builder(entityPackage, entityBuilder.addModifiers(Modifier.PUBLIC).build()).skipJavaLangImports(true).indent("    ").build();
-            file.writeTo(entityDirectory);
+            file.writeTo(new File(entityDirectory + srcPath).toPath());
         }
         if (entityInfo != null && entityInfo.isMapEntity()) {
             JavaFile file = JavaFile.builder(entityPackage, itemBuilder.addModifiers(Modifier.PUBLIC).build()).skipJavaLangImports(true).indent("    ").build();
-            file.writeTo(entityDirectory);
+            file.writeTo(new File(entityDirectory + srcPath).toPath());
         }
 
         for (TypeSpec.Builder eventBuilder : eventBuilders) {
             JavaFile file = JavaFile.builder(eventPackage, eventBuilder.addModifiers(Modifier.PUBLIC).build()).skipJavaLangImports(true).indent("    ").build();
-            file.writeTo(eventDirectory);
+            file.writeTo(new File(eventDirectory + srcPath).toPath());
         }
 
         for (TypeSpec.Builder commandBuilder : commandBuilders) {
             JavaFile file = JavaFile.builder(commandPackage, commandBuilder.addModifiers(Modifier.PUBLIC).build()).skipJavaLangImports(true).indent("    ").build();
-            file.writeTo(commandDirectory);
+            file.writeTo(new File(commandDirectory + srcPath).toPath());
         }
 
         for (TypeSpec.Builder enumBuilder : enumBuilders) {
             JavaFile file = JavaFile.builder(enumPackage, enumBuilder.addModifiers(Modifier.PUBLIC).build()).skipJavaLangImports(true).indent("    ").build();
-            file.writeTo(enumDirectory);
+            file.writeTo(new File(enumDirectory + srcPath).toPath());
         }
     }
 

@@ -24,7 +24,7 @@ public class EntityCodeGenerator {
         }
 
         SchemaParser parser = new SchemaParser(basePackage + ".entity" + packageName,basePackage + ".events" + packageName, basePackage + ".commands" + packageName, basePackage + ".enums",new FileInputStream(file));
-        parser.writeTo(new File(entityPath).toPath(), new File(eventPath).toPath(), new File(commandPath).toPath(), new File(enumPath).toPath());
+        parser.writeTo(entityPath, eventPath, commandPath, enumPath);
     }
 
 
