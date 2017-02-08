@@ -41,6 +41,7 @@ public abstract class MapEntity<I, E extends Entity> extends Entity<E> {
 
     /**
      * Returns a sequential {@code Stream} with this collection as its source.
+     *
      * @return a sequential {@code Stream} over the elements in this collection
      */
     public Stream<I> stream() {

@@ -52,6 +52,14 @@ public abstract class Entity<E extends Entity> {
     public abstract String getId();
 
     /**
+     * Gets the apply delegation class. This class can be used to handle events which cannot be auto generated.
+     * @return the delegation class
+     */
+    protected Class<?> getApplyDelegateClass() {
+        return null;
+    }
+
+    /**
      * Apply the given {@link Event} to the entity. The entity id of the {@link Event} will be overwritten with the id
      * of the {@code Entity}
      *
@@ -84,9 +92,19 @@ public abstract class Entity<E extends Entity> {
 
     private Map<Class<?>, Method> buildApplyMap() {
         Method[] methods = this.getClass().getDeclaredMethods();
-        return Arrays.stream(methods).filter(method -> method.getName().equals("apply"))
+        Map<Class<?>, Method> applyMap = Arrays.stream(methods).filter(method -> method.getName().equals("apply"))
                 .filter(method -> method.getParameterTypes().length == 1)
                 .collect(Collectors.toMap(method -> method.getParameterTypes()[0], Function.identity()));
+        if (getApplyDelegateClass() != null) {
+            methods = this.getClass().getDeclaredMethods();
+            Map<Class<?>, Method> applyMap2 = Arrays.stream(methods).filter(method -> method.getName().equals("apply"))
+                    .filter(method -> method.getParameterTypes().length == 1)
+                    .collect(Collectors.toMap(method -> method.getParameterTypes()[0], Function.identity()));
+            for (Map.Entry<? extends Class<?>, Method> methodEntry : applyMap2.entrySet()) {
+                applyMap.put(methodEntry.getKey(), methodEntry.getValue());
+            }
+        }
+        return applyMap;
     }
 
 }
