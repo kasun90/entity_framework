@@ -1,0 +1,23 @@
+package com.ust.query.operators;
+
+import com.google.gson.JsonObject;
+
+public class AndOpr extends BinaryOpNode {
+
+    public AndOpr(BinaryOpNode left, BinaryOpNode right) {
+        set(left, right);
+    }
+
+    @Override
+    public boolean eval(JsonObject json) {
+        boolean rVal = right.getAs(BinaryOpNode.class).eval(json);
+        boolean lVal = left.getAs(BinaryOpNode.class).eval(json);
+        return rVal && lVal;
+    }
+
+     @Override
+    public String toString() {
+        return "( "+left.toString() + " && " + right.toString() + " )";
+    }
+    
+}

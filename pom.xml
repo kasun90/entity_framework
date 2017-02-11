@@ -10,6 +10,7 @@
         <module>web_api</module>
         <module>storage</module>
         <module>cluster</module>
+        <module>query</module>
     </modules>
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
