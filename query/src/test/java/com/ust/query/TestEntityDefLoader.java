@@ -7,7 +7,7 @@ import java.util.Map;
 
 public class TestEntityDefLoader implements EntityDefinitionLoader {
 
-    List<EntityDefinition> defList = new LinkedList<>();
+    private List<EntityDefinition> defList = new LinkedList<>();
 
     public TestEntityDefLoader() {
         Map<String, Class<?>> fields = new HashMap<>();

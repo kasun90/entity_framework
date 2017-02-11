@@ -16,6 +16,7 @@ import com.ust.query.operators.QueryExp;
 import org.junit.Assert;
 import org.junit.Test;
 
+@SuppressWarnings("PMD")
 public class QueryExpTest {
 
     private JsonObject json;

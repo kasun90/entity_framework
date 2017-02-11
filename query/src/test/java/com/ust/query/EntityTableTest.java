@@ -7,26 +7,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+@SuppressWarnings("PMD")
 public class EntityTableTest {
 
-     Connection connection ;
-    public EntityTableTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
+    private Connection connection;
 
     @Before
     public void setUp() throws ClassNotFoundException, SQLException {
@@ -43,26 +32,25 @@ public class EntityTableTest {
 
     @Test
     public void test_connection() throws SQLException {
-            ResultSet rs
-                = connection.getMetaData().getTables(null, null, null, null);
-            if(rs.next())
-                assertEquals("Student", rs.getString(3));
-            else
-                Assert.fail("table not found");
-          
-        
+        ResultSet rs
+            = connection.getMetaData().getTables(null, null, null, null);
+        if (rs.next()) {
+            assertEquals("Student", rs.getString(3));
+        } else {
+            Assert.fail("table not found");
+        }
+
     }
-    
+
     @Test
     public void get_all_entities_test() throws SQLException {
 
-           PreparedStatement stmt  = connection.prepareStatement("select name ,age from Student where name = 'nuwan' and (age = 10 or name = 'sanjeewa' and age = 20) ");
-           ResultSet rs = stmt.executeQuery();
-            while(rs.next())
-            {
-                System.out.println(rs.getString(1));
-                 System.out.println(rs.getInt(2));
-            }
+        PreparedStatement stmt = connection.prepareStatement("select name ,age from Student where name = 'nuwan' and (age = 10 or name = 'sanjeewa' and age = 20) ");
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+            System.out.println(rs.getString(1));
+            System.out.println(rs.getInt(2));
+        }
 //            
 //            PreparedStatement stmt  = connection.prepareStatement("select name from Student where age = 10");
 //            ResultSet rs = stmt.executeQuery();
@@ -70,6 +58,6 @@ public class EntityTableTest {
 //            {
 //                System.out.println(rs.getString(1));
 //            }
-        
+
     }
 }

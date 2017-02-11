@@ -21,7 +21,7 @@ public class EntityTable implements ProjectableFilterableTable {
     private EntityDefinition def;
     private RelDataType dataTypes;
     
-    final ImmutableList<Object[]> rows = ImmutableList.of(
+    private final ImmutableList<Object[]> rows = ImmutableList.of(
         new Object[]{"paint", 10, "galle"},
         new Object[]{"paper", 5, "nugegoda"},
         new Object[]{"brush", 6, "colombo"},

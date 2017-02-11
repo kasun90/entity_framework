@@ -15,12 +15,13 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+@SuppressWarnings("PMD")
 public class ExpressionUtilTest {
 
     private List<String> fields;
     private final RelDataTypeFactory typeFactory = new JavaTypeFactoryImpl(RelDataTypeSystem.DEFAULT);
-    RexBuilder rexBuilder;
-    List<RelDataType> types;
+    private RexBuilder rexBuilder;
+    private List<RelDataType> types;
 
     @Before
     public void setUp() {

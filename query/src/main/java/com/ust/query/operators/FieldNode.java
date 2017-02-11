@@ -1,7 +1,7 @@
 package com.ust.query.operators;
 
 public class FieldNode implements ExpNode{
-    String fieldName;
+    private String fieldName;
 
     public FieldNode(String fieldName) {
         this.fieldName = fieldName;

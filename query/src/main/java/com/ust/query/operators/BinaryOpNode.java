@@ -4,8 +4,8 @@ import com.google.gson.JsonObject;
 
 public abstract class BinaryOpNode implements ExpNode {
 
-    ExpNode left;
-    ExpNode right;
+    protected ExpNode left;
+    protected ExpNode right;
 
     public abstract boolean eval(JsonObject json);
 
