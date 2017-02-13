@@ -27,6 +27,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+
 @SuppressWarnings("PMD")
 public class SpiTest {
 
