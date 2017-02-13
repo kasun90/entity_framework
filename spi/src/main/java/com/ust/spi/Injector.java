@@ -11,7 +11,7 @@ import java.lang.reflect.Type;
  * Utility class for the test case {@link EntityCommandHandler} creation.
  */
 public class Injector {
-    
+
     private RepositoryRegistry repositoryRegistry;
     private CacheRegistry cacheRegistry;
 

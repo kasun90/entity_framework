@@ -27,7 +27,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-
 @SuppressWarnings("PMD")
 public class SpiTest {
 
@@ -38,29 +37,17 @@ public class SpiTest {
         injector = new InMemoryInjector();
     }
 
-    @Test
+    @Test(expected = EntityException.class)
     public void entity_exception_test() {
-        //Injector injector = new Injector();
         User user = new User();
         EntityExceptionCreationEvent event = new EntityExceptionCreationEvent();
-        try {
-            user.applyEvent(event);
-            Assert.fail();
-        } catch (Throwable ex) {
-            Assert.assertEquals(EntityException.class, ex.getClass());
-        }
-        Assert.assertEquals(null, event.getEntityId());
+        user.applyEvent(event);
     }
 
-    @Test
+    @Test(expected = CommandException.class)
     public void command_exception_test() {
         CommandExceptionHandler handler = new CommandExceptionHandler();
-        try {
-            handler.execute(new PasswordResetRequest("", ""));
-            Assert.fail();
-        } catch (Throwable ex) {
-            Assert.assertEquals(CommandException.class, ex.getClass());
-        }
+        handler.execute(new PasswordResetRequest("", ""));
     }
 
     @Test
@@ -108,27 +95,16 @@ public class SpiTest {
         }
     }
 
-    @Test
+    @Test(expected = EntityException.class)
     public void mapEntityInvalidEventTest() {
         TestMapEntity mapEntity = new TestMapEntity();
-        try {
-            mapEntity.applyEvent("1", new UnusedEvent());
-            Assert.fail();
-        } catch (Throwable ex) {
-            Assert.assertEquals(EntityException.class, ex.getClass());
-        }
+        mapEntity.applyEvent("1", new UnusedEvent());
     }
 
-    @Test
+    @Test(expected = EntityException.class)
     public void entity_exception_test2() {
         User user = new User();
-        try {
-            user.applyEvent(new UnusedEvent());
-            Assert.fail();
-        } catch (Throwable ex) {
-            Assert.assertEquals(EntityException.class, ex.getClass());
-        }
-        Assert.assertEquals(0, user.getEvents().size());
+        user.applyEvent(new UnusedEvent());
     }
 
     @Test

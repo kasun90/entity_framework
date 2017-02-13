@@ -1,0 +1,14 @@
+{
+  version: '1.0',
+  defaultSchema: 'Entities',
+  schemas: [
+    {
+      name: 'Entities',
+      type: "custom",
+      factory: "com.ust.query.EntitySchemaFactory",
+      operand: {
+        loader: "com.ust.query.TestEntityDefLoader"
+      }
+    }
+  ]
+}
