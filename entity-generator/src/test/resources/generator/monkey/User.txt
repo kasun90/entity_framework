@@ -1,0 +1,31 @@
+
+Entity Order<com.ust.entity.donkey.User> : This represents a user of the system {
+    String userId       : user identifier
+    String email       : user identifier
+    String address       : user identifier
+    BigDecimal age      : sdfsd sfd sfs df
+    int value           : sdf fs fsdf sdf sdf sd
+
+    apply OrderCreated   : dasd asd asd sadasd asdasdasdas
+    apply OrderAddressChanged : asd asd asdas dasdas dasd
+}
+
+Event OrderCreated : gsdsdgs dfsd fsdfsdfsd {
+    userId
+    age
+    value
+    email
+}
+
+Event OrderAddressChanged : gsdsdgs dfsd fsdfsdfsd{
+    userId
+    address
+}
+
+Enum RegisterState : Ammoooooo  {
+	DONKEY
+	MONKEY
+	FUNKEY
+}
+
+

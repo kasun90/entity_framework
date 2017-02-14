@@ -11,6 +11,7 @@
         <module>storage</module>
         <module>cluster</module>
         <module>entity-generator</module>
+        <module>test-utils</module>
         <module>query</module>
     </modules>
     <properties>

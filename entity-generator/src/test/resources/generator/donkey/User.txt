@@ -1,0 +1,36 @@
+
+Entity User : This represents a user of the system {
+    String userId       : user identifier
+    String email       : user identifier
+    String address       : user identifier
+    BigDecimal age      : sdfsd sfd sfs df
+    int value           : sdf fs fsdf sdf sdf sd
+
+    apply UserCreated   : dasd asd asd sadasd asdasdasdas
+    apply AddressChanged : asd asd asdas dasdas dasd
+}
+
+Event UserCreated : gsdsdgs dfsd fsdfsdfsd {
+    userId
+    age
+    value
+    email
+}
+
+Event AddressChanged : gsdsdgs dfsd fsdfsdfsd{
+    userId
+    address
+}
+
+Command RegisterUser<RegisterStatus> : This represents a user of the system {
+    String userId       : user identifier
+    String email       : user identifier
+    String address       : user identifier
+    BigDecimal age      : sdfsd sfd sfs df
+    int value           : sdf fs fsdf sdf sdf sd
+
+    Response RegisterStatus : Ayyoooooo {
+		String userId       : user identifier
+		String email        : user identifier
+	}
+}

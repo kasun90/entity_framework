@@ -1,6 +1,14 @@
 package com.ust.entitygenerator;
 
-public final class FieldInfo {
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.TypeName;
+
+import java.math.BigDecimal;
+
+/**
+ * This holds the field information of an object.
+ */
+final class FieldInfo {
     private final String fieldName;
     private final String dataType;
     private final String javaDoc;
@@ -19,10 +27,6 @@ public final class FieldInfo {
 
     public String getDataType() {
         return dataType;
-    }
-
-    public String getJavaDoc() {
-        return javaDoc;
     }
 
     public String getGetterJavaDoc() {

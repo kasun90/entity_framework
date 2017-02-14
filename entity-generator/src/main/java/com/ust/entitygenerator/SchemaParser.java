@@ -1,39 +1,57 @@
 package com.ust.entitygenerator;
 
-import com.squareup.javapoet.*;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
+import com.squareup.javapoet.TypeSpec;
 import com.ust.spi.Command;
 import com.ust.spi.Entity;
 import com.ust.spi.Event;
 import com.ust.spi.MapEntity;
+import com.ust.spi.utils.SpiUtils;
+import org.junit.Test;
 
 import javax.lang.model.element.Modifier;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.math.BigDecimal;
-import java.nio.file.Path;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-public class SchemaParser {
+/**
+ * This uses to parse the code auto generation schema files.
+ */
+final class SchemaParser {
     private final String entityPackage;
     private final String eventPackage;
     private final String commandPackage;
     private final BufferedReader reader;
-    TypeSpec.Builder entityBuilder;
 
-    TypeSpec.Builder itemBuilder;
-    ClassInfo entityInfo = null;
-    EventInfo eventInfo = null;
-    ClassInfo commandInfo = null;
-    Map<String, EventInfo> events = new HashMap<>();
-    List<TypeSpec.Builder> eventBuilders = new LinkedList<>();
+    private ClassInfo entityInfo = null;
+    private EventInfo eventInfo = null;
+    private ClassInfo commandInfo = null;
+    private final Map<String, EventInfo> events = new HashMap<>();
 
-    List<TypeSpec.Builder> commandBuilders = new LinkedList<>();
-    List<ClassInfo> commands = new LinkedList<>();
+    private final List<ClassInfo> commands = new LinkedList<>();
 
-    EnumInfo enumInfo = null;
-    List<EnumInfo> enumInfos = new LinkedList<>();
-    List<TypeSpec.Builder> enumBuilders = new LinkedList<>();
-    private String enumPackage;
+    private EnumInfo enumInfo = null;
+    private final List<EnumInfo> enumInfos = new LinkedList<>();
+    private final String enumPackage;
 
+    /**
+     * The entity parsing type.
+     */
     enum ParsingType {
         NO_IN,
         IN_ENTITY,
@@ -45,7 +63,8 @@ public class SchemaParser {
         IN_ENUM
     }
 
-    public SchemaParser(String entityPackage, String eventPackage, String commandPackage, String enumPackage, InputStream stream) {
+    public SchemaParser(final String entityPackage, final String eventPackage,
+                        final String commandPackage, final String enumPackage, final InputStream stream) {
         this.entityPackage = entityPackage;
         this.eventPackage = eventPackage;
         this.commandPackage = commandPackage;
@@ -53,50 +72,115 @@ public class SchemaParser {
         reader = new BufferedReader(new InputStreamReader(stream));
     }
 
-    public void writeTo(String entityDirectory, String eventDirectory, String commandDirectory, String enumDirectory) throws IOException, ClassNotFoundException {
+    public void writeTo(final String entityDirectory, final String eventDirectory, final String commandDirectory,
+                        final String enumDirectory) throws IOException {
         read();
         String srcPath = "/src/main/java";
-        if (entityBuilder != null) {
-            JavaFile file = JavaFile.builder(entityPackage, entityBuilder.addModifiers(Modifier.PUBLIC).build()).skipJavaLangImports(true).indent("    ").build();
+        String testPath = "/src/test/java";
+        if (entityInfo != null) {
+            JavaFile file = JavaFile.builder(entityPackage, entityInfo.getBuilder()
+                    .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                    .addSuperinterface(Serializable.class).build()).skipJavaLangImports(true).indent("    ").build();
             file.writeTo(new File(entityDirectory + srcPath).toPath());
+            System.out.println("Entity         : " + entityPackage + "." + entityInfo.getClassName());
+
+            file = JavaFile.builder(entityPackage, entityInfo.getTester().addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                    .addSuperinterface(Serializable.class).build()).skipJavaLangImports(true).indent("    ").build();
+            file.writeTo(new File(entityDirectory + testPath).toPath());
+            System.out.println("EntityTest     : " + entityPackage + "." + entityInfo.getClassName() + "Test");
         }
+
         if (entityInfo != null && entityInfo.isMapEntity()) {
-            JavaFile file = JavaFile.builder(entityPackage, itemBuilder.addModifiers(Modifier.PUBLIC).build()).skipJavaLangImports(true).indent("    ").build();
+            JavaFile file = JavaFile.builder(entityPackage, entityInfo.getItemClass().getBuilder()
+                    .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                    .addSuperinterface(Serializable.class).build()).skipJavaLangImports(true).indent("    ").build();
             file.writeTo(new File(entityDirectory + srcPath).toPath());
+            System.out.println("EntityItem     : " + entityPackage + "." + entityInfo.getItemClass().getClassName());
+
+            file = JavaFile.builder(entityPackage, entityInfo.getItemClass().getTester()
+                    .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                    .addSuperinterface(Serializable.class).build())
+                    .skipJavaLangImports(true).indent("    ").build();
+            file.writeTo(new File(entityDirectory + testPath).toPath());
+            System.out.println("EntityItemTest : " + entityPackage + "." + entityInfo.getItemClass().getClassName()
+                    + "Test");
         }
 
-        for (TypeSpec.Builder eventBuilder : eventBuilders) {
-            JavaFile file = JavaFile.builder(eventPackage, eventBuilder.addModifiers(Modifier.PUBLIC).build()).skipJavaLangImports(true).indent("    ").build();
+        for (EventInfo eventInfo : events.values()) {
+            JavaFile file = JavaFile.builder(eventPackage, eventInfo.getBuilder()
+                    .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                    .addSuperinterface(Serializable.class).build()).skipJavaLangImports(true).indent("    ").build();
             file.writeTo(new File(eventDirectory + srcPath).toPath());
+            System.out.println("Event          : " + eventPackage + "." + eventInfo.getName());
+
+            file = JavaFile.builder(eventPackage, eventInfo.getTester()
+                    .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                    .addSuperinterface(Serializable.class)
+                    .build())
+                    .skipJavaLangImports(true).indent("    ")
+                    .build();
+            file.writeTo(new File(eventDirectory + testPath).toPath());
+            System.out.println("EventTest      : " + eventPackage + "." + eventInfo.getName() + "Test");
         }
 
-        for (TypeSpec.Builder commandBuilder : commandBuilders) {
-            JavaFile file = JavaFile.builder(commandPackage, commandBuilder.addModifiers(Modifier.PUBLIC).build()).skipJavaLangImports(true).indent("    ").build();
+        for (ClassInfo command : commands) {
+            JavaFile file = JavaFile.builder(commandPackage, command.getBuilder()
+                    .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                    .addSuperinterface(Serializable.class).build())
+                    .skipJavaLangImports(true).indent("    ")
+                    .build();
             file.writeTo(new File(commandDirectory + srcPath).toPath());
+            System.out.println("Command        : " + commandPackage + "." + command.getClassName());
+            file = JavaFile.builder(commandPackage, command.getTester()
+                    .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                    .addSuperinterface(Serializable.class)
+                    .build())
+                    .skipJavaLangImports(true).indent("    ").build();
+            file.writeTo(new File(commandDirectory + testPath).toPath());
+            System.out.println("CommandTest    : " + commandPackage + "." + command.getClassName() + "Test");
+
+            if (command.getItemClass() != null) {
+                file = JavaFile.builder(commandPackage, command.getItemClass().getBuilder()
+                        .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                        .addSuperinterface(Serializable.class).build()).skipJavaLangImports(true).indent("    ").build();
+                file.writeTo(new File(commandDirectory + srcPath).toPath());
+                System.out.println("CommandResponse     : " + commandPackage + "." + command.getItemClass().getClassName());
+
+                file = JavaFile.builder(commandPackage, command.getItemClass().getTester()
+                        .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                        .addSuperinterface(Serializable.class).build())
+                        .skipJavaLangImports(true).indent("    ").build();
+                file.writeTo(new File(commandDirectory + testPath).toPath());
+                System.out.println("CommandResponseTest : " + commandPackage + "." + command.getItemClass().getClassName()
+                        + "Test");
+            }
         }
 
-        for (TypeSpec.Builder enumBuilder : enumBuilders) {
-            JavaFile file = JavaFile.builder(enumPackage, enumBuilder.addModifiers(Modifier.PUBLIC).build()).skipJavaLangImports(true).indent("    ").build();
+        for (EnumInfo info : enumInfos) {
+            JavaFile file = JavaFile.builder(enumPackage, info.getBuilder()
+                    .addModifiers(Modifier.PUBLIC)
+                    .build())
+                    .skipJavaLangImports(true).indent("    ").build();
             file.writeTo(new File(enumDirectory + srcPath).toPath());
+            System.out.println("Enum           : " + enumPackage + "." + info.getName());
         }
     }
 
-    public void read() throws IOException, ClassNotFoundException {
+    public void read() throws IOException {
 
         String line;
         ParsingType parsingType = ParsingType.NO_IN;
-
+        int lineNumber = 0;
         while ((line = reader.readLine()) != null) {
             line = line.trim();
+            ++lineNumber;
             if (line.isEmpty()) {
                 continue;
             }
-            System.out.println(line);
             if (parsingType == ParsingType.NO_IN) {
                 String[] split = line.split(":");
                 if (split.length != 2) {
-                    System.out.println("Skipped line \"" + line + "\"");
-                    continue;
+                    throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
                 }
                 String[] typeData = split[0].split(" ");
                 if (typeData[0].trim().equals("Entity")) {
@@ -146,8 +230,7 @@ public class SchemaParser {
                 } else {
                     String[] split = line.split(":");
                     if (split.length != 2) {
-                        System.out.println("Skipped line \"" + line + "\"");
-                        continue;
+                        throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
                     }
                     String[] parts = split[0].split(" ");
                     String dataType = parts[0].trim();
@@ -166,8 +249,7 @@ public class SchemaParser {
                 } else {
                     String[] split = line.split(":");
                     if (split.length != 2) {
-                        System.out.println("Skipped line \"" + line + "\"");
-                        continue;
+                        throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
                     }
                     String[] parts = split[0].split(" ");
                     String dataType = parts[0].trim();
@@ -187,22 +269,25 @@ public class SchemaParser {
                 } else {
                     String[] split = line.split(":");
                     if (split.length != 2) {
-                        System.out.println("Skipped line \"" + line + "\"");
-                        continue;
+                        throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
                     }
                     String[] parts = split[0].split(" ");
                     String dataType = parts[0].trim();
                     String fieldName = parts[1].trim();
 
-                    if (dataType.equals("apply")) {
-                        entityInfo.getEventApplyInfo().add(new EventApplyInfo(fieldName, split[1].trim()));
-                    } else if (dataType.equals("Item")) {
-                        entityInfo.setItemClass(new ClassInfo());
-                        entityInfo.getItemClass().setClassName(fieldName);
-                        parsingType = ParsingType.IN_MAP_ENTITY_ITEM;
-                        entityInfo.getItemClass().setJavaDoc(split[1].split("\\{")[0].trim());
-                    } else {
-                        entityInfo.addField(new FieldInfo(fieldName, dataType, split[1].trim(), entityInfo));
+                    switch (dataType) {
+                        case "apply":
+                            entityInfo.getEventApplyInfo().add(new EventApplyInfo(fieldName, split[1].trim()));
+                            break;
+                        case "Item":
+                            entityInfo.setItemClass(new ClassInfo());
+                            entityInfo.getItemClass().setClassName(fieldName);
+                            parsingType = ParsingType.IN_MAP_ENTITY_ITEM;
+                            entityInfo.getItemClass().setJavaDoc(split[1].split("\\{")[0].trim());
+                            break;
+                        default:
+                            entityInfo.addField(new FieldInfo(fieldName, dataType, split[1].trim(), entityInfo));
+                            break;
                     }
                 }
             } else if (parsingType == ParsingType.IN_MAP_ENTITY_ITEM) {
@@ -211,17 +296,18 @@ public class SchemaParser {
                 } else {
                     String[] split = line.split(":");
                     if (split.length != 2) {
-                        System.out.println("Skipped line \"" + line + "\"");
-                        continue;
+                        throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
                     }
                     String[] parts = split[0].split(" ");
                     String dataType = parts[0].trim();
                     String fieldName = parts[1].trim();
 
                     if (dataType.equals("apply")) {
-                        entityInfo.getItemClass().getEventApplyInfo().add(new EventApplyInfo(fieldName, split[1].trim()));
+                        entityInfo.getItemClass().getEventApplyInfo()
+                                .add(new EventApplyInfo(fieldName, split[1].trim()));
                     } else {
-                        entityInfo.getItemClass().addField(new FieldInfo(fieldName, dataType, split[1].trim(), entityInfo.getItemClass()));
+                        entityInfo.getItemClass().addField(
+                                new FieldInfo(fieldName, dataType, split[1].trim(), entityInfo.getItemClass()));
                     }
                 }
             } else if (parsingType == ParsingType.IN_COMMAND_RESPONSE) {
@@ -230,13 +316,13 @@ public class SchemaParser {
                 } else {
                     String[] split = line.split(":");
                     if (split.length != 2) {
-                        System.out.println("Skipped line \"" + line + "\"");
-                        continue;
+                        throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
                     }
                     String[] parts = split[0].split(" ");
                     String dataType = parts[0].trim();
                     String fieldName = parts[1].trim();
-                    commandInfo.getItemClass().addField(new FieldInfo(fieldName, dataType, split[1].trim(), commandInfo.getItemClass()));
+                    commandInfo.getItemClass().addField(
+                            new FieldInfo(fieldName, dataType, split[1].trim(), commandInfo.getItemClass()));
                 }
             } else if (parsingType == ParsingType.IN_ENUM) {
                 if (line.equals("}")) {
@@ -270,171 +356,237 @@ public class SchemaParser {
         TypeSpec.Builder builder = TypeSpec.enumBuilder(info.getName());
         builder.addJavadoc(info.getJavaDoc() + ".\n");
         info.getItems().forEach(builder::addEnumConstant);
-        enumBuilders.add(builder);
+        info.setBuilder(builder);
     }
 
     private void generateEntity(ClassInfo classInfo, boolean item) {
-        try {
-            TypeSpec.Builder builder = TypeSpec.classBuilder(classInfo.getClassName());
-            if (item) {
-                itemBuilder = builder;
-            } else {
-                entityBuilder = builder;
-            }
-
-            builder.addJavadoc(classInfo.getJavaDoc() + ".\n");
-
-            FieldInfo idField = classInfo.getFields().get(0);
-
-            if (!item) {
-                String javaDoc = "Gets the unique identifier of the {@link Entity}.\n\n@return the entity id\n";
-                if (classInfo.isMapEntity()) {
-                    javaDoc = "Gets the unique identifier of the {@link MapEntity}.\n\n@return the entity id\n";
-                }
-                builder.addMethod(MethodSpec.methodBuilder("getId")
-                        .addJavadoc(javaDoc)
-                        .addCode("return $L;\n", idField.getFieldName())
-                        .addAnnotation(Override.class)
-                        .returns(String.class)
-                        .addModifiers(Modifier.PUBLIC)
-                        .build());
-
-                if (classInfo.isMapEntity()) {
-                    builder.addMethod(MethodSpec.constructorBuilder().addCode("super($T.class);\n", getType(classInfo.getItemClass().getClassName())).addModifiers(Modifier.PUBLIC).build());
-                }
-            }
-
-            for (FieldInfo fieldInfo : classInfo.getFields()) {
-                builder.addField(FieldSpec.builder(getType(fieldInfo.getDataType()), fieldInfo.getFieldName(), Modifier.PRIVATE).build());
-                builder.addMethod(MethodSpec.methodBuilder(getGetter(fieldInfo.getFieldName()))
-                        .addJavadoc(fieldInfo.getGetterJavaDoc())
-                        .addCode("return $L;\n", fieldInfo.getFieldName())
-                        .returns(getType(fieldInfo.getDataType()))
-                        .addModifiers(Modifier.PUBLIC)
-                        .build());
-            }
-
-
-            for (EventApplyInfo eventApplyInfo : classInfo.getEventApplyInfo()) {
-                EventInfo eventInfo = events.get(eventApplyInfo.getEventName());
-
-                StringBuilder eventApplyBuilder = new StringBuilder();
-                for (String field : eventInfo.getFields()) {
-                    if (!item || entityInfo.getItemClass().getFieldInfo(field) != null) {
-                        eventApplyBuilder.append("this.").append(field).append(" = event.").append(getGetter(field)).append("();\n");
-                    }
-                }
-
-                builder.addMethod(MethodSpec.methodBuilder("apply")
-                        .addJavadoc(eventApplyInfo.getJavaDoc() + ".\n\n@param event the event to be applied\n")
-                        .addParameter(getType(eventPackage + "." + eventInfo.getName()), "event", Modifier.FINAL)
-                        .addCode(eventApplyBuilder.toString())
-                        .addModifiers(Modifier.PUBLIC)
-                        .build());
-            }
-
-            if (!item) {
-                if (classInfo.isMapEntity()) {
-                    builder.superclass(ParameterizedTypeName.get(ClassName.get(MapEntity.class),
-                            classInfo.getParentType().stream().map(ClassName::bestGuess).toArray(TypeName[]::new)));
-                } else {
-                    if (classInfo.getParentType().isEmpty()) {
-                        builder.superclass(Entity.class);
-                    } else {
-                        builder.superclass(ParameterizedTypeName.get(ClassName.get(Entity.class),
-                                classInfo.getParentType().stream().map(ClassName::bestGuess).toArray(TypeName[]::new)));
-                    }
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            throw new RuntimeException(ex);
+        TypeSpec.Builder builder = TypeSpec.classBuilder(classInfo.getClassName());
+        if (item) {
+            entityInfo.getItemClass().setBuilder(builder);
+        } else {
+            entityInfo.setBuilder(builder);
         }
+
+        builder.addJavadoc(classInfo.getJavaDoc() + ".\n");
+
+        FieldInfo idField = classInfo.getFields().get(0);
+
+        if (!item) {
+            String javaDoc = "Gets the unique identifier of the {@link Entity}.\n\n@return the entity id\n";
+            if (classInfo.isMapEntity()) {
+                javaDoc = "Gets the unique identifier of the {@link MapEntity}.\n\n@return the entity id\n";
+            }
+            builder.addMethod(MethodSpec.methodBuilder("getId")
+                    .addJavadoc(javaDoc)
+                    .addCode("return $L;\n", idField.getFieldName())
+                    .addAnnotation(Override.class)
+                    .returns(String.class)
+                    .addModifiers(Modifier.PUBLIC)
+                    .build());
+
+            if (classInfo.isMapEntity()) {
+                builder.addMethod(MethodSpec.constructorBuilder().addCode("super($T.class);\n",
+                        getType(classInfo.getItemClass().getClassName())).addModifiers(Modifier.PUBLIC).build());
+            }
+        }
+
+        builder.addMethod(MethodSpec.methodBuilder("toString")
+                .returns(String.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
+                .addJavadoc("Returns a string representation of the object.\n"
+                        + "@return a string representation of the object\n")
+                .addCode("return $T.getToString(this);\n", SpiUtils.class).build());
+
+        for (FieldInfo fieldInfo : classInfo.getFields()) {
+            builder.addField(FieldSpec.builder(getType(fieldInfo.getDataType()),
+                    fieldInfo.getFieldName(), Modifier.PRIVATE).build());
+            builder.addMethod(MethodSpec.methodBuilder(getGetter(fieldInfo.getDataType(), fieldInfo.getFieldName()))
+                    .addJavadoc(fieldInfo.getGetterJavaDoc())
+                    .addCode("return $L;\n", fieldInfo.getFieldName())
+                    .returns(getType(fieldInfo.getDataType()))
+                    .addModifiers(Modifier.PUBLIC)
+                    .build());
+        }
+
+
+        for (EventApplyInfo eventApplyInfo : classInfo.getEventApplyInfo()) {
+            EventInfo eventInfo = events.get(eventApplyInfo.getEventName());
+
+            StringBuilder eventApplyBuilder = new StringBuilder();
+            for (String field : eventInfo.getFields()) {
+                if (!item || entityInfo.getItemClass().getFieldInfo(field) != null) {
+                    eventApplyBuilder.append("this.").append(field).append(" = event.")
+                            .append(getGetter(classInfo.getFieldInfo(field).getDataType(), field)).append("();\n");
+                }
+            }
+
+            builder.addMethod(MethodSpec.methodBuilder("apply")
+                    .addJavadoc(eventApplyInfo.getJavaDoc() + ".\n\n@param event the event to be applied\n")
+                    .addParameter(getType(eventPackage + "." + eventInfo.getName()), "event", Modifier.FINAL)
+                    .addCode(eventApplyBuilder.toString())
+                    .addModifiers(Modifier.PUBLIC)
+                    .build());
+        }
+
+        if (!item) {
+            if (classInfo.isMapEntity()) {
+                builder.superclass(ParameterizedTypeName.get(ClassName.get(MapEntity.class),
+                        classInfo.getParentType().stream().map(ClassName::bestGuess).toArray(TypeName[]::new)));
+            } else {
+                if (classInfo.getParentType().isEmpty()) {
+                    builder.superclass(Entity.class);
+                } else {
+                    builder.superclass(ParameterizedTypeName.get(ClassName.get(Entity.class),
+                            classInfo.getParentType().stream().map(ClassName::bestGuess).toArray(TypeName[]::new)));
+                }
+            }
+        }
+
+        TypeSpec.Builder tester = TypeSpec.classBuilder(classInfo.getClassName() + "Test");
+        if (item) {
+            entityInfo.getItemClass().setTester(tester);
+        } else {
+            entityInfo.setTester(tester);
+        }
+
+
+        String method = "testEntity";
+        if (item) {
+            method = "testEntityItem";
+        }
+        tester.addMethod(MethodSpec.methodBuilder("autoTest")
+                .addAnnotation(Test.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addException(Exception.class)
+                .addCode("$L." + method + "($L.class);\n",
+                        getType("com.ust.testutils.AutoGeneratedClassTester"),
+                        getType(entityPackage + "." + classInfo.getClassName()))
+                .build());
     }
 
     private void generateCommand(ClassInfo classInfo, boolean response) {
-        try {
-            TypeSpec.Builder builder = TypeSpec.classBuilder(classInfo.getClassName());
+        TypeSpec.Builder builder = TypeSpec.classBuilder(classInfo.getClassName());
 
-            builder.addJavadoc(classInfo.getJavaDoc() + ".\n");
+        builder.addJavadoc(classInfo.getJavaDoc() + ".\n");
 
-            if (!response) {
-                FieldInfo idField = classInfo.getFields().get(0);
+        if (!response) {
+            FieldInfo idField = classInfo.getFields().get(0);
 
-                String javaDoc = "Gets the unique identifier of the {@link Command}.\n\n@return the command key\n";
+            String javaDoc = "Gets the unique identifier of the {@link Command}.\n\n@return the command key\n";
 
-                builder.addMethod(MethodSpec.methodBuilder("getKey")
-                        .addJavadoc(javaDoc)
-                        .addCode("return $L;\n", idField.getFieldName())
-                        .addAnnotation(Override.class)
-                        .returns(String.class)
-                        .addModifiers(Modifier.PUBLIC)
-                        .build());
-            }
-
-            for (FieldInfo fieldInfo : classInfo.getFields()) {
-                builder.addField(FieldSpec.builder(getType(fieldInfo.getDataType()), fieldInfo.getFieldName(), Modifier.PRIVATE, Modifier.FINAL).build());
-                builder.addMethod(MethodSpec.methodBuilder(getGetter(fieldInfo.getFieldName()))
-                        .addJavadoc(fieldInfo.getGetterJavaDoc())
-                        .addCode("return $L;\n", fieldInfo.getFieldName())
-                        .returns(getType(fieldInfo.getDataType()))
-                        .addModifiers(Modifier.PUBLIC)
-                        .build());
-            }
-
-            if (!response) {
-                builder.addSuperinterface(ParameterizedTypeName.get(ClassName.get(Command.class),
-                        classInfo.getParentType().stream().map(ClassName::bestGuess).toArray(TypeName[]::new)));
-            }
-
-            MethodSpec.Builder constructor = MethodSpec.constructorBuilder();
-            for (FieldInfo fieldInfo : classInfo.getFields()) {
-                constructor.addParameter(ParameterSpec.builder(getType(fieldInfo.getDataType()), fieldInfo.getFieldName()).build());
-                constructor.addCode("this." + fieldInfo.getFieldName() + " = " + fieldInfo.getFieldName() + ";\n");
-            }
-            builder.addMethod(constructor.build());
-            commandBuilders.add(builder);
-            if (classInfo.getItemClass() != null) {
-                generateCommand(classInfo.getItemClass(), true);
-            }
-        } catch (ClassNotFoundException ex) {
-            throw new RuntimeException(ex);
+            builder.addMethod(MethodSpec.methodBuilder("getKey")
+                    .addJavadoc(javaDoc)
+                    .addCode("return $L;\n", idField.getFieldName())
+                    .addAnnotation(Override.class)
+                    .returns(String.class)
+                    .addModifiers(Modifier.PUBLIC)
+                    .build());
         }
+
+        for (FieldInfo fieldInfo : classInfo.getFields()) {
+            builder.addField(FieldSpec.builder(getType(fieldInfo.getDataType()),
+                    fieldInfo.getFieldName(), Modifier.PRIVATE, Modifier.FINAL).build());
+            builder.addMethod(MethodSpec.methodBuilder(getGetter(fieldInfo.getDataType(), fieldInfo.getFieldName()))
+                    .addJavadoc(fieldInfo.getGetterJavaDoc())
+                    .addCode("return $L;\n", fieldInfo.getFieldName())
+                    .returns(getType(fieldInfo.getDataType()))
+                    .addModifiers(Modifier.PUBLIC)
+                    .build());
+        }
+
+        if (!response) {
+            builder.addSuperinterface(ParameterizedTypeName.get(ClassName.get(Command.class),
+                    classInfo.getParentType().stream().map(ClassName::bestGuess).toArray(TypeName[]::new)));
+        }
+
+        MethodSpec.Builder constructor = MethodSpec.constructorBuilder();
+        for (FieldInfo fieldInfo : classInfo.getFields()) {
+            constructor.addParameter(ParameterSpec.builder(getType(fieldInfo.getDataType()),
+                    fieldInfo.getFieldName()).addModifiers(Modifier.FINAL).build());
+            constructor.addCode("this." + fieldInfo.getFieldName() + " = " + fieldInfo.getFieldName() + ";\n");
+            constructor.addModifiers(Modifier.PUBLIC);
+        }
+        builder.addMethod(constructor.build());
+
+        builder.addMethod(MethodSpec.methodBuilder("toString")
+                .returns(String.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
+                .addJavadoc("Returns a string representation of the object.\n"
+                        + "@return a string representation of the object\n")
+                .addCode("return $T.getToString(this);\n", SpiUtils.class).build());
+
+        classInfo.setBuilder(builder);
+        if (classInfo.getItemClass() != null) {
+            generateCommand(classInfo.getItemClass(), true);
+        }
+
+        TypeSpec.Builder testBuilder = TypeSpec.classBuilder(classInfo.getClassName() + "Test");
+        String method = "test";
+        if (!response) {
+            method = "testCommand";
+        }
+        testBuilder.addMethod(MethodSpec.methodBuilder("autoTest")
+                .addAnnotation(Test.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addException(Exception.class)
+                .addCode("$L." + method + "($L.class);\n",
+                        getType("com.ust.testutils.AutoGeneratedClassTester"),
+                        getType(commandPackage + "." + classInfo.getClassName()))
+                .build());
+        classInfo.setTester(testBuilder);
     }
 
     private void generateEvents(EventInfo info) {
-        try {
-            TypeSpec.Builder builder = TypeSpec.classBuilder(info.getName());
-            builder.superclass(Event.class);
-            builder.addJavadoc(info.getJavaDoc() + ".\n");
-            MethodSpec.Builder constructor = MethodSpec.constructorBuilder();
+        TypeSpec.Builder builder = TypeSpec.classBuilder(info.getName());
+        builder.superclass(Event.class);
+        builder.addJavadoc(info.getJavaDoc() + ".\n");
+        MethodSpec.Builder constructor = MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC);
 
-            for (String s : info.getFields()) {
-                FieldInfo fieldInfo = entityInfo.getFieldInfo(s);
-                if (entityInfo.isMapEntity() && fieldInfo == null) {
-                    fieldInfo = entityInfo.getItemClass().getFieldInfo(s);
-                }
-                builder.addField(FieldSpec.builder(getType(fieldInfo.getDataType()), fieldInfo.getFieldName(), Modifier.PRIVATE, Modifier.FINAL).build());
-                builder.addMethod(MethodSpec.methodBuilder(getGetter(fieldInfo.getFieldName()))
-                        .returns(getType(fieldInfo.getDataType()))
-                        .addModifiers(Modifier.PUBLIC)
-                        .addCode("return $L;\n", fieldInfo.getFieldName())
-                        .addJavadoc(fieldInfo.getGetterJavaDoc())
-                        .build());
-                constructor.addParameter(ParameterSpec.builder(getType(fieldInfo.getDataType()), fieldInfo.getFieldName()).build());
-                constructor.addCode("this." + fieldInfo.getFieldName() + " = " + fieldInfo.getFieldName() + ";\n");
+        for (String s : info.getFields()) {
+            FieldInfo fieldInfo = entityInfo.getFieldInfo(s);
+            if (entityInfo.isMapEntity() && fieldInfo == null) {
+                fieldInfo = entityInfo.getItemClass().getFieldInfo(s);
             }
-            builder.addMethod(constructor.build());
-            eventBuilders.add(builder);
-        } catch (ClassNotFoundException ex) {
-            throw new RuntimeException(ex);
+            builder.addField(FieldSpec.builder(getType(fieldInfo.getDataType()),
+                    fieldInfo.getFieldName(), Modifier.PRIVATE, Modifier.FINAL).build());
+            builder.addMethod(MethodSpec.methodBuilder(getGetter(fieldInfo.getDataType(), fieldInfo.getFieldName()))
+                    .returns(getType(fieldInfo.getDataType()))
+                    .addModifiers(Modifier.PUBLIC)
+                    .addCode("return $L;\n", fieldInfo.getFieldName())
+                    .addJavadoc(fieldInfo.getGetterJavaDoc())
+                    .build());
+            constructor.addParameter(ParameterSpec.builder(getType(fieldInfo.getDataType()),
+                    fieldInfo.getFieldName()).addModifiers(Modifier.FINAL).build());
+            constructor.addCode("this." + fieldInfo.getFieldName() + " = " + fieldInfo.getFieldName() + ";\n");
         }
+        builder.addMethod(constructor.build());
+
+        builder.addMethod(MethodSpec.methodBuilder("toString")
+                .returns(String.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
+                .addJavadoc("Returns a string representation of the object.\n"
+                        + "@return a string representation of the object\n")
+                .addCode("return $T.getToString(this);\n", SpiUtils.class).build());
+
+        info.setBuilder(builder);
+
+        TypeSpec.Builder testBuilder = TypeSpec.classBuilder(info.getName() + "Test");
+        testBuilder.addMethod(MethodSpec.methodBuilder("autoTest")
+                .addAnnotation(Test.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addException(Exception.class)
+                .addCode("$L.test($L.class);\n", getType("com.ust.testutils.AutoGeneratedClassTester"),
+                        getType(eventPackage + "." + info.getName()))
+                .build());
+        info.setTester(testBuilder);
     }
 
-    private TypeName getType(String name) throws ClassNotFoundException {
+    private TypeName getType(String name) {
         if (name.indexOf('.') != -1) {
-            int i = name.lastIndexOf('.');
             return ClassName.bestGuess(name);
-            //return ParameterizedTypeName.get(ClassName.get(name.substring(0, i), name.substring(i + 1)));
         }
 
         switch (name) {
@@ -463,8 +615,10 @@ public class SchemaParser {
         }
     }
 
-    private String getGetter(String fieldName) {
+    private String getGetter(String type, String fieldName) {
+        if (type.equals("boolean") || type.equals("Boolean")) {
+            return "is" + fieldName.toUpperCase().charAt(0) + fieldName.substring(1);
+        }
         return "get" + fieldName.toUpperCase().charAt(0) + fieldName.substring(1);
     }
-
 }

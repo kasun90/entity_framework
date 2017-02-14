@@ -1,0 +1,57 @@
+Entity User<Person> : This represents a user of the system {
+    String fieldOne          : field one description
+    boolean fieldTwo         : field two description
+}
+
+==== src/main/java/entity/User.java
+package entity;
+
+import com.ust.spi.Entity;
+import com.ust.spi.utils.SpiUtils;
+import java.io.Serializable;
+
+/**
+ * This represents a user of the system.
+ */
+public final class User extends Entity<Person> implements Serializable {
+    private String fieldOne;
+
+    private boolean fieldTwo;
+
+    /**
+     * Gets the unique identifier of the {@link Entity}.
+     *
+     * @return the entity id
+     */
+    @Override
+    public String getId() {
+        return fieldOne;
+    }
+
+    /**
+     * Returns a string representation of the object.
+     * @return a string representation of the object
+     */
+    @Override
+    public String toString() {
+        return SpiUtils.getToString(this);
+    }
+
+    /**
+     * Gets field one description.
+     *
+     * @return fieldOne the user.
+     */
+    public String getFieldOne() {
+        return fieldOne;
+    }
+
+    /**
+     * Gets field two description.
+     *
+     * @return fieldTwo the user.
+     */
+    public boolean isFieldTwo() {
+        return fieldTwo;
+    }
+}

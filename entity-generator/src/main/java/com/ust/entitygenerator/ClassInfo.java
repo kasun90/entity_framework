@@ -1,20 +1,27 @@
 package com.ust.entitygenerator;
 
+import com.squareup.javapoet.TypeSpec;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public final class ClassInfo {
-    private String packageName = "";
+/**
+ * This keeps the class information of the schema.
+ */
+final class ClassInfo {
     private String className;
     private String javaDoc;
-    private List<String> parentType = new LinkedList<>();
-    private List<FieldInfo> fields = new LinkedList<>();
-    private Map<String, FieldInfo> fieldsByName = new HashMap<>();
-    private List<EventApplyInfo> eventApplyInfo = new LinkedList<>();
+    private final List<String> parentType = new LinkedList<>();
+    private final List<FieldInfo> fields = new LinkedList<>();
+    private final Map<String, FieldInfo> fieldsByName = new HashMap<>();
+    private final List<EventApplyInfo> eventApplyInfo = new LinkedList<>();
     boolean mapEntity = false;
     private ClassInfo itemClass = null;
+
+    TypeSpec.Builder builder;
+    TypeSpec.Builder tester;
 
     public ClassInfo() {
 
@@ -44,10 +51,6 @@ public final class ClassInfo {
         this.javaDoc = javaDoc;
     }
 
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
-    }
-
     public void setClassName(String className) {
         this.className = className;
     }
@@ -57,11 +60,7 @@ public final class ClassInfo {
     }
 
     public void addParentType(String parentType) {
-        this.parentType .add(parentType);
-    }
-
-    public String getPackageName() {
-        return packageName;
+        this.parentType.add(parentType);
     }
 
     public String getClassName() {
@@ -83,5 +82,21 @@ public final class ClassInfo {
 
     public List<EventApplyInfo> getEventApplyInfo() {
         return eventApplyInfo;
+    }
+
+    public TypeSpec.Builder getBuilder() {
+        return builder;
+    }
+
+    public void setBuilder(TypeSpec.Builder builder) {
+        this.builder = builder;
+    }
+
+    public TypeSpec.Builder getTester() {
+        return tester;
+    }
+
+    public void setTester(TypeSpec.Builder tester) {
+        this.tester = tester;
     }
 }

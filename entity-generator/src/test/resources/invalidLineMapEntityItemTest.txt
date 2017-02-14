@@ -1,0 +1,15 @@
+MapEntity OrderBook<OpenOrder,Order> : This represents a user of the system {
+    String instId       : user identifier
+	Item OpenOrder : Ayyoooooo {
+		invalid line
+		String userId       : user identifier
+		String email        : user identifier
+		String address      : user identifier
+		BigDecimal age      : sdfsd sfd sfs df
+		int value           : sdf fs fsdf sdf sdf sd
+
+		apply OrderAdded : Grrrrrrrrrrrrrrrrrrrr
+	}
+}
+
+==== src/main/java/entity/OrderBook.java

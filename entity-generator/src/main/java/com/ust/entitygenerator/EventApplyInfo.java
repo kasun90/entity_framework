@@ -1,6 +1,9 @@
 package com.ust.entitygenerator;
 
-public final class EventApplyInfo {
+/**
+ * This keeps the event application information of the schema entity.
+ */
+final class EventApplyInfo {
     private final String eventName;
     private final String javaDoc;
 

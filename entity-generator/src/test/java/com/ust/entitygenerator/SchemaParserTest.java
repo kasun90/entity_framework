@@ -1,46 +1,85 @@
 package com.ust.entitygenerator;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.StringReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import static org.junit.Assert.*;
+import java.util.Map;
 
 public class SchemaParserTest {
 
+    AutogenValidator validator;
+    @Before
+    public void begin() {
+        validator = new AutogenValidator();
+    }
+
+    @After
+    public void end() throws Exception {
+        validator.close();
+        validator = null;
+    }
+
     @Test
-    public void simpleTest() throws IOException, ClassNotFoundException {
-        String spec = "Entity User<Order> : This represents a user of the system {  \t\t\t\n" +
-                "    String userId         : user identifier\n" +
-                "    BigDecimal age      : sdfsd sfd sfs df\n" +
-                "    int value             : sdf fs fsdf sdf sdf sd\n" +
-                "    String email             : sdf fs fsdf sdf sdf sd\n" +
-                "    String address             : sdf fs fsdf sdf sdf sd\n" +
-                "\n" +
-                "    apply UserCreated : dasd asd asd sadasd asdasdasdas\n" +
-                "    apply AddressChanged : asd asd asdas dasdas dasd\n" +
-                "}\n" +
-                "\n" +
-                "Event UserCreated : gsdsdgs dfsd fsdfsdfsd {\n" +
-                "    userId\n" +
-                "    age\n" +
-                "    value\n" +
-                "    email\n" +
-                "}\n" +
-                "\n" +
-                "Event AddressChanged : gsdsdgs dfsd fsdfsdfsd{\n" +
-                "    userId\n" +
-                "    address\n" +
-                "}\n";
-        SchemaParser parser = new SchemaParser( "com.test.entity", "com.test.events", "com.test.commands", "com.test.enums", new ByteArrayInputStream(spec.getBytes()));
+    public void simpleEntityTest() throws Exception {
+        validator.validateFile("simpleEntityTest.txt");
+    }
 
-        Path test = Files.createTempDirectory("test");
+    @Test
+    public void evenApplyTest() throws IOException, Exception {
+        validator.validateFile("evenApplyTest.txt");
+    }
 
-        parser.writeTo(test,test,test,test);
-        System.out.println("Written to " + test);
+    @Test
+    public void mapEntityTest() throws IOException, Exception {
+        validator.validateFile("mapEntityTest.txt");
+    }
+
+    @Test
+    public void commandTest() throws IOException, Exception {
+        validator.validateFile("commandTest.txt");
+    }
+
+
+    @Test
+    public void enumTest() throws IOException, Exception {
+        validator.validateFile("enumTest.txt");
+    }
+
+    @Test
+    public void entityWithParentTest() throws IOException, Exception {
+        validator.validateFile("entityWithParentTest.txt");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void invalidLineOuterTest() throws IOException, Exception {
+        validator.validateFile("invalidLineOuterTest.txt");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void invalidLineEntityTest() throws IOException, Exception {
+        validator.validateFile("invalidLineEntityTest.txt");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void invalidLineMapEntityTest() throws IOException, Exception {
+        validator.validateFile("invalidLineMapEntityTest.txt");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void invalidLineMapEntityItemTest() throws IOException, Exception {
+        validator.validateFile("invalidLineMapEntityItemTest.txt");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void invalidLineCommandResponseTest() throws IOException, Exception {
+        validator.validateFile("invalidLineCommandResponseTest.txt");
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void invalidLineCommandTest() throws IOException, Exception {
+        validator.validateFile("invalidLineCommandTest.txt");
     }
 }

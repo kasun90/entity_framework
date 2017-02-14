@@ -1,0 +1,18 @@
+Enum RegisterState : Ammoooooo  {
+	DONKEY
+	MONKEY
+	FUNKEY
+}
+==== src/main/java/enums/RegisterState.java
+package enums;
+
+/**
+ * Ammoooooo.
+ */
+public enum RegisterState {
+    DONKEY,
+
+    MONKEY,
+
+    FUNKEY
+}

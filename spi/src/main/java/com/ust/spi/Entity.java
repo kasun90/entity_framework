@@ -106,5 +106,4 @@ public abstract class Entity<E extends Entity> {
         }
         return applyMap;
     }
-
 }
