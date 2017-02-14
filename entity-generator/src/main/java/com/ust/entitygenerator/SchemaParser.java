@@ -50,7 +50,7 @@ final class SchemaParser {
     private final String enumPackage;
 
     private ParsingType parsingType = ParsingType.NO_IN;
-    int lineNumber = 0;
+    private int lineNumber = 0;
 
     /**
      * The entity parsing type.
@@ -233,7 +233,7 @@ final class SchemaParser {
         } else {
             String[] split = line.split(":");
             if (split.length != 2) {
-                throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
+                throw new CodeGenerationException("Failed to process line " + lineNumber + ".\nLine=" + line);
             }
             String[] parts = split[0].split(" ");
             String dataType = parts[0].trim();
@@ -249,7 +249,7 @@ final class SchemaParser {
         } else {
             String[] split = line.split(":");
             if (split.length != 2) {
-                throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
+                throw new CodeGenerationException("Failed to process line " + lineNumber + ".\nLine=" + line);
             }
             String[] parts = split[0].split(" ");
             String dataType = parts[0].trim();
@@ -271,7 +271,7 @@ final class SchemaParser {
         } else {
             String[] split = line.split(":");
             if (split.length != 2) {
-                throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
+                throw new CodeGenerationException("Failed to process line " + lineNumber + ".\nLine=" + line);
             }
             String[] parts = split[0].split(" ");
             String dataType = parts[0].trim();
@@ -301,7 +301,7 @@ final class SchemaParser {
         } else {
             String[] split = line.split(":");
             if (split.length != 2) {
-                throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
+                throw new CodeGenerationException("Failed to process line " + lineNumber + ".\nLine=" + line);
             }
             String[] parts = split[0].split(" ");
             String dataType = parts[0].trim();
@@ -323,7 +323,7 @@ final class SchemaParser {
         } else {
             String[] split = line.split(":");
             if (split.length != 2) {
-                throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
+                throw new CodeGenerationException("Failed to process line " + lineNumber + ".\nLine=" + line);
             }
             String[] parts = split[0].split(" ");
             String dataType = parts[0].trim();
@@ -340,7 +340,7 @@ final class SchemaParser {
     private void processNotIn(String line) {
         String[] split = line.split(":");
         if (split.length != 2) {
-            throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
+            throw new CodeGenerationException("Failed to process line " + lineNumber + ".\nLine=" + line);
         }
         String[] typeData = split[0].split(" ");
         if ("Entity".equals(typeData[0].trim())) {
@@ -424,13 +424,7 @@ final class SchemaParser {
             }
         }
 
-        builder.addMethod(MethodSpec.methodBuilder("toString")
-                .returns(String.class)
-                .addModifiers(Modifier.PUBLIC)
-                .addAnnotation(Override.class)
-                .addJavadoc("Returns a string representation of the object.\n"
-                        + "@return a string representation of the object\n")
-                .addCode("return $T.getToString(this);\n", SpiUtils.class).build());
+        addToString(builder);
 
         for (FieldInfo fieldInfo : classInfo.getFields()) {
             builder.addField(FieldSpec.builder(getType(fieldInfo.getDataType()),
@@ -444,6 +438,36 @@ final class SchemaParser {
         }
 
 
+        addEntityEventHandlers(classInfo, item, builder);
+
+        if (!item) {
+            if (classInfo.isMapEntity()) {
+                builder.superclass(ParameterizedTypeName.get(ClassName.get(MapEntity.class),
+                        classInfo.getParentType().stream().map(ClassName::bestGuess).toArray(TypeName[]::new)));
+            } else {
+                if (classInfo.getParentType().isEmpty()) {
+                    builder.superclass(Entity.class);
+                } else {
+                    builder.superclass(ParameterizedTypeName.get(ClassName.get(Entity.class),
+                            classInfo.getParentType().stream().map(ClassName::bestGuess).toArray(TypeName[]::new)));
+                }
+            }
+        }
+
+        generateEntityTest(classInfo, item);
+    }
+
+    private void addToString(TypeSpec.Builder builder) {
+        builder.addMethod(MethodSpec.methodBuilder("toString")
+                .returns(String.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
+                .addJavadoc("Returns a string representation of the object.\n"
+                        + "@return a string representation of the object\n")
+                .addCode("return $T.getToString(this);\n", SpiUtils.class).build());
+    }
+
+    private void addEntityEventHandlers(ClassInfo classInfo, boolean item, TypeSpec.Builder builder) {
         for (EventApplyInfo eventApplyInfo : classInfo.getEventApplyInfo()) {
             EventInfo eventInfo = events.get(eventApplyInfo.getEventName());
 
@@ -462,21 +486,9 @@ final class SchemaParser {
                     .addModifiers(Modifier.PUBLIC)
                     .build());
         }
+    }
 
-        if (!item) {
-            if (classInfo.isMapEntity()) {
-                builder.superclass(ParameterizedTypeName.get(ClassName.get(MapEntity.class),
-                        classInfo.getParentType().stream().map(ClassName::bestGuess).toArray(TypeName[]::new)));
-            } else {
-                if (classInfo.getParentType().isEmpty()) {
-                    builder.superclass(Entity.class);
-                } else {
-                    builder.superclass(ParameterizedTypeName.get(ClassName.get(Entity.class),
-                            classInfo.getParentType().stream().map(ClassName::bestGuess).toArray(TypeName[]::new)));
-                }
-            }
-        }
-
+    private void generateEntityTest(ClassInfo classInfo, boolean item) {
         TypeSpec.Builder tester = TypeSpec.classBuilder(classInfo.getClassName() + "Test");
         if (item) {
             entityInfo.getItemClass().setTester(tester);
@@ -543,19 +555,17 @@ final class SchemaParser {
         }
         builder.addMethod(constructor.build());
 
-        builder.addMethod(MethodSpec.methodBuilder("toString")
-                .returns(String.class)
-                .addModifiers(Modifier.PUBLIC)
-                .addAnnotation(Override.class)
-                .addJavadoc("Returns a string representation of the object.\n"
-                        + "@return a string representation of the object\n")
-                .addCode("return $T.getToString(this);\n", SpiUtils.class).build());
+        addToString(builder);
 
         classInfo.setBuilder(builder);
         if (classInfo.getItemClass() != null) {
             generateCommand(classInfo.getItemClass(), true);
         }
 
+        generateCommandTest(classInfo, response);
+    }
+
+    private void generateCommandTest(ClassInfo classInfo, boolean response) {
         TypeSpec.Builder testBuilder = TypeSpec.classBuilder(classInfo.getClassName() + "Test");
         String method = "test";
         if (!response) {
@@ -597,13 +607,7 @@ final class SchemaParser {
         }
         builder.addMethod(constructor.build());
 
-        builder.addMethod(MethodSpec.methodBuilder("toString")
-                .returns(String.class)
-                .addModifiers(Modifier.PUBLIC)
-                .addAnnotation(Override.class)
-                .addJavadoc("Returns a string representation of the object.\n"
-                        + "@return a string representation of the object\n")
-                .addCode("return $T.getToString(this);\n", SpiUtils.class).build());
+        addToString(builder);
 
         info.setBuilder(builder);
 
