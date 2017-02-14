@@ -665,10 +665,10 @@ final class SchemaParser {
         return "get" + fieldName.toUpperCase().charAt(0) + fieldName.substring(1);
     }
 
-    private String getJavaDoc(String line) {
-        line = line.trim();
-        int index1 = line.indexOf(":");
-        String doc = line.substring(index1 + 1, line.length() - 1).trim();
+    private String getJavaDoc(final String line) {
+        String trimmedLine = line.trim();
+        int index1 = trimmedLine.indexOf(":");
+        String doc = trimmedLine.substring(index1 + 1, trimmedLine.length() - 1).trim();
         if (doc.charAt(doc.length() - 1) != '.') {
             doc = doc + ".";
         }
