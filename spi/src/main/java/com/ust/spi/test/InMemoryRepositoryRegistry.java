@@ -17,6 +17,7 @@ public final class InMemoryRepositoryRegistry implements RepositoryRegistry {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Entity> EntityRepository<T> getRepository(Class<T> entityType) {
-        return (EntityRepository<T>) entityRepositoryMap.computeIfAbsent(entityType, k -> new InMemoryEntityRepository<T>());
+        return (EntityRepository<T>) entityRepositoryMap
+                .computeIfAbsent(entityType, k -> new InMemoryEntityRepository<T>());
     }
 }

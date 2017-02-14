@@ -50,7 +50,8 @@ public final class EntityCodeGenerator {
      * @throws Exception exception while generating classes
      */
     public static void main(String[] args) throws Exception {
-        BufferedReader in = new BufferedReader(new FileReader(args[0]));
+        BufferedReader in = new BufferedReader(
+                new FileReader((args.length == 1) ? args[0] : "entity-schema/autogen.conf"));
         String line;
 
         String packageName = "";

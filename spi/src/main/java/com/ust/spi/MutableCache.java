@@ -40,7 +40,7 @@ public interface MutableCache extends Cache {
      * @param key the key to be search
      * @return availability of that key
      */
-    boolean containsKey(Object key);
+    boolean containsKey(String key);
 
     /**
      * If the specified key is not already associated with a value (or is mapped

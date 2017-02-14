@@ -23,7 +23,7 @@ public abstract class MapEntity<I, E extends Entity> extends Entity<E> {
     private static final Map<Class<?>, Map<Class<?>, Method>> maps = new ConcurrentHashMap<>();
 
     private final Map<String, I> items = new HashMap<>();
-    private final Class<I> itemClazz;
+    private final transient Class<I> itemClazz;
 
     public MapEntity(Class<I> itemClazz) {
         this.itemClazz = itemClazz;

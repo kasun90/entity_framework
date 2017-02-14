@@ -285,7 +285,7 @@ final class SchemaParser {
                     entityInfo.setItemClass(new ClassInfo());
                     entityInfo.getItemClass().setClassName(fieldName);
                     parsingType = ParsingType.IN_MAP_ENTITY_ITEM;
-                    entityInfo.getItemClass().setJavaDoc(split[1].split("\\{")[0].trim());
+                    entityInfo.getItemClass().setJavaDoc(getJavaDoc(line));
                     break;
                 default:
                     entityInfo.addField(new FieldInfo(fieldName, dataType, split[1].trim(), entityInfo));
@@ -310,7 +310,7 @@ final class SchemaParser {
                 commandInfo.setItemClass(new ClassInfo());
                 commandInfo.getItemClass().setClassName(fieldName);
                 parsingType = ParsingType.IN_COMMAND_RESPONSE;
-                commandInfo.getItemClass().setJavaDoc(split[1].split("\\{")[0].trim());
+                commandInfo.getItemClass().setJavaDoc(getJavaDoc(line));
             } else {
                 commandInfo.addField(new FieldInfo(fieldName, dataType, split[1].trim(), commandInfo));
             }
@@ -352,7 +352,7 @@ final class SchemaParser {
             if (types.length == 2) {
                 entityInfo.addParentType(types[1].trim());
             }
-            entityInfo.setJavaDoc(split[1].split("\\{")[0].trim());
+            entityInfo.setJavaDoc(getJavaDoc(line));
         } else if ("MapEntity".equals(typeData[0].trim())) {
             parsingType = ParsingType.IN_MAP_ENTITY;
             String[] types = typeData[1].trim().split("<|>");
@@ -363,7 +363,7 @@ final class SchemaParser {
                 Arrays.stream(types[1].trim().split(",")).map(String::trim)
                         .forEach(s -> entityInfo.addParentType(s));
             }
-            entityInfo.setJavaDoc(split[1].split("\\{")[0].trim());
+            entityInfo.setJavaDoc(getJavaDoc(line));
         } else if ("Command".equals(typeData[0].trim())) {
             parsingType = ParsingType.IN_COMMAND;
             String[] types = typeData[1].trim().split("<|>");
@@ -374,21 +374,21 @@ final class SchemaParser {
                 Arrays.stream(types[1].trim().split(",")).map(String::trim)
                         .forEach(s -> commandInfo.addParentType(s));
             }
-            commandInfo.setJavaDoc(split[1].split("\\{")[0].trim());
+            commandInfo.setJavaDoc(getJavaDoc(line));
         } else if ("Enum".equals(typeData[0].trim())) {
             parsingType = ParsingType.IN_ENUM;
 
             enumInfo = new EnumInfo(typeData[1].trim());
-            enumInfo.setJavaDoc(split[1].split("\\{")[0].trim());
+            enumInfo.setJavaDoc(getJavaDoc(line));
         } else if ("Event".equals(typeData[0].trim())) {
             parsingType = ParsingType.IN_EVENT;
-            eventInfo = new EventInfo(typeData[1].trim(), split[1].split("\\{")[0].trim());
+            eventInfo = new EventInfo(typeData[1].trim(), getJavaDoc(line));
         }
     }
 
     private void generateEnums(EnumInfo info) {
         TypeSpec.Builder builder = TypeSpec.enumBuilder(info.getName());
-        builder.addJavadoc(info.getJavaDoc() + ".\n");
+        builder.addJavadoc(info.getJavaDoc() + "\n");
         info.getItems().forEach(builder::addEnumConstant);
         info.setBuilder(builder);
     }
@@ -401,7 +401,7 @@ final class SchemaParser {
             entityInfo.setBuilder(builder);
         }
 
-        builder.addJavadoc(classInfo.getJavaDoc() + ".\n");
+        builder.addJavadoc(classInfo.getJavaDoc() + "\n");
 
         FieldInfo idField = classInfo.getFields().get(0);
 
@@ -514,7 +514,7 @@ final class SchemaParser {
     private void generateCommand(ClassInfo classInfo, boolean response) {
         TypeSpec.Builder builder = TypeSpec.classBuilder(classInfo.getClassName());
 
-        builder.addJavadoc(classInfo.getJavaDoc() + ".\n");
+        builder.addJavadoc(classInfo.getJavaDoc() + "\n");
 
         if (!response) {
             FieldInfo idField = classInfo.getFields().get(0);
@@ -585,7 +585,7 @@ final class SchemaParser {
     private void generateEvents(EventInfo info) {
         TypeSpec.Builder builder = TypeSpec.classBuilder(info.getName());
         builder.superclass(Event.class);
-        builder.addJavadoc(info.getJavaDoc() + ".\n");
+        builder.addJavadoc(info.getJavaDoc() + "\n");
         MethodSpec.Builder constructor = MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC);
 
         for (String s : info.getFields()) {
@@ -658,5 +658,15 @@ final class SchemaParser {
             return "is" + fieldName.toUpperCase().charAt(0) + fieldName.substring(1);
         }
         return "get" + fieldName.toUpperCase().charAt(0) + fieldName.substring(1);
+    }
+
+    private String getJavaDoc(String line) {
+        line = line.trim();
+        int index1 = line.indexOf(":");
+        String doc = line.substring(index1 + 1, line.length() - 1).trim();
+        if (doc.charAt(doc.length() - 1) != '.') {
+            doc = doc + ".";
+        }
+        return doc;
     }
 }

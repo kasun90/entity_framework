@@ -16,12 +16,13 @@ public class EntityCodeGeneratorTest {
             constructor.setAccessible(true);
             constructor.newInstance();
             ClassLoader classLoader = getClass().getClassLoader();
-            File file = new File(classLoader.getResource("generator/autogen.conf").getFile());
+            File file = new File(classLoader.getResource("generator/entity-schema/autogen.conf").getFile());
             String load = Files.createTempDirectory("load").toString();
             System.setProperty("user.dir", load);
             EntityCodeGenerator.main(new String[]{file.getAbsolutePath()});
             FileUtils.deleteDirectory(new File(load));
         } catch (Exception ex) {
+            ex.printStackTrace();
             Assert.fail();
         }
     }
