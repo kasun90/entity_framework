@@ -204,7 +204,6 @@
                      value="Method name ''{0}'' must match pattern ''{1}''."/>
         </module>
         <module name="SingleLineJavadoc"/>
-		<module name="DesignForExtension"/>
         <module name="FinalClass"/>
         <module name="HideUtilityClassConstructor"/>
         <module name="InterfaceIsType"/>
