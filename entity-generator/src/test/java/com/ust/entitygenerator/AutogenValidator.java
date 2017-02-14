@@ -15,7 +15,7 @@ public class AutogenValidator implements AutoCloseable {
     private String input;
     private String basePath;
 
-    public void validateFile(String filename) throws Exception {
+    public boolean validateFile(String filename) throws Exception {
         TestCaseLoader loader = new TestCaseLoader();
         loader.load(filename);
         setInput(loader.getInput());
@@ -23,6 +23,7 @@ public class AutogenValidator implements AutoCloseable {
         for (Map.Entry<String, String> entry : loader.getOutput().entrySet()) {
             Assert.assertEquals(entry.getKey(), entry.getValue(), getCode(entry.getKey()));
         }
+        return true;
     }
 
     public void setInput(String input) {
