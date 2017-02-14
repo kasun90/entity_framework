@@ -89,7 +89,7 @@ final class SchemaParser {
             System.out.println("Entity         : " + entityPackage + "." + entityInfo.getClassName());
 
             file = JavaFile.builder(entityPackage, entityInfo.getTester().addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                    .addSuperinterface(Serializable.class).build())
+                    .build())
                     .addStaticImport(Assert.class, "assertTrue").skipJavaLangImports(true).indent("    ").build();
             file.writeTo(new File(entityDirectory + testPath).toPath());
             System.out.println("EntityTest     : " + entityPackage + "." + entityInfo.getClassName() + "Test");
@@ -104,7 +104,7 @@ final class SchemaParser {
 
             file = JavaFile.builder(entityPackage, entityInfo.getItemClass().getTester()
                     .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                    .addSuperinterface(Serializable.class).build())
+                    .build())
                     .addStaticImport(Assert.class, "assertTrue")
                     .skipJavaLangImports(true).indent("    ").build();
             file.writeTo(new File(entityDirectory + testPath).toPath());
@@ -121,7 +121,6 @@ final class SchemaParser {
 
             file = JavaFile.builder(eventPackage, eventInfo.getTester()
                     .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                    .addSuperinterface(Serializable.class)
                     .build())
                     .addStaticImport(Assert.class, "assertTrue")
                     .skipJavaLangImports(true).indent("    ")
@@ -140,7 +139,6 @@ final class SchemaParser {
             System.out.println("Command        : " + commandPackage + "." + command.getClassName());
             file = JavaFile.builder(commandPackage, command.getTester()
                     .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                    .addSuperinterface(Serializable.class)
                     .build())
                     .addStaticImport(Assert.class, "assertTrue")
                     .skipJavaLangImports(true).indent("    ").build();
@@ -158,7 +156,7 @@ final class SchemaParser {
 
                 file = JavaFile.builder(commandPackage, command.getItemClass().getTester()
                         .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                        .addSuperinterface(Serializable.class).build())
+                        .build())
                         .addStaticImport(Assert.class, "assertTrue")
                         .skipJavaLangImports(true).indent("    ").build();
                 file.writeTo(new File(commandDirectory + testPath).toPath());
