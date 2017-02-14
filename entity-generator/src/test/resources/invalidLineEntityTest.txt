@@ -1,0 +1,6 @@
+Entity User : This represents a user of the system {
+	invalid line
+    String fieldOne          : field one description
+    boolean fieldTwo         : field two description
+}
+==== no/file

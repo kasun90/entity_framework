@@ -1,0 +1,142 @@
+Entity User : This represents a user of the system {
+    String fieldOne          : field one description
+    boolean fieldTwo         : field two description
+    Boolean fieldThree       : field three description
+    long fieldFour           : field four description
+    Long fieldFive           : field five description
+    BigDecimal fieldSix      : field six description
+    int fieldSeven           : field seven description
+    Integer fieldEight       : field eight description
+    Donkey fieldNine         : field nine description
+}
+
+==== src/main/java/entity/User.java
+package entity;
+
+import com.ust.spi.Entity;
+import com.ust.spi.utils.SpiUtils;
+import java.io.Serializable;
+import java.math.BigDecimal;
+
+/**
+ * This represents a user of the system.
+ */
+public final class User extends Entity implements Serializable {
+    private String fieldOne;
+
+    private boolean fieldTwo;
+
+    private Boolean fieldThree;
+
+    private long fieldFour;
+
+    private Long fieldFive;
+
+    private BigDecimal fieldSix;
+
+    private int fieldSeven;
+
+    private Integer fieldEight;
+
+    private Donkey fieldNine;
+
+    /**
+     * Gets the unique identifier of the {@link Entity}.
+     *
+     * @return the entity id
+     */
+    @Override
+    public String getId() {
+        return fieldOne;
+    }
+
+    /**
+     * Returns a string representation of the object.
+     * @return a string representation of the object
+     */
+    @Override
+    public String toString() {
+        return SpiUtils.getToString(this);
+    }
+
+    /**
+     * Gets field one description.
+     *
+     * @return fieldOne the user.
+     */
+    public String getFieldOne() {
+        return fieldOne;
+    }
+
+    /**
+     * Gets field two description.
+     *
+     * @return fieldTwo the user.
+     */
+    public boolean isFieldTwo() {
+        return fieldTwo;
+    }
+
+    /**
+     * Gets field three description.
+     *
+     * @return fieldThree the user.
+     */
+    public Boolean isFieldThree() {
+        return fieldThree;
+    }
+
+    /**
+     * Gets field four description.
+     *
+     * @return fieldFour the user.
+     */
+    public long getFieldFour() {
+        return fieldFour;
+    }
+
+    /**
+     * Gets field five description.
+     *
+     * @return fieldFive the user.
+     */
+    public Long getFieldFive() {
+        return fieldFive;
+    }
+
+    /**
+     * Gets field six description.
+     *
+     * @return fieldSix the user.
+     */
+    public BigDecimal getFieldSix() {
+        return fieldSix;
+    }
+
+    /**
+     * Gets field seven description.
+     *
+     * @return fieldSeven the user.
+     */
+    public int getFieldSeven() {
+        return fieldSeven;
+    }
+
+    /**
+     * Gets field eight description.
+     *
+     * @return fieldEight the user.
+     */
+    public Integer getFieldEight() {
+        return fieldEight;
+    }
+
+    /**
+     * Gets field nine description.
+     *
+     * @return fieldNine the user.
+     */
+    public Donkey getFieldNine() {
+        return fieldNine;
+    }
+}

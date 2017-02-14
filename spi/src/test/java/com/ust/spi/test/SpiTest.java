@@ -5,7 +5,10 @@
  */
 package com.ust.spi.test;
 
-import com.ust.spi.*;
+import com.ust.spi.EntityCommandHandler;
+import com.ust.spi.EntityRepository;
+import com.ust.spi.Injector;
+import com.ust.spi.MutableCache;
 import com.ust.spi.ex.CommandException;
 import com.ust.spi.ex.EntityException;
 import com.ust.spi.test.command.PasswordResetRequest;
@@ -16,7 +19,10 @@ import com.ust.spi.test.event.EntityExceptionCreationEvent;
 import com.ust.spi.test.event.PasswordChanged;
 import com.ust.spi.test.event.UnusedEvent;
 import com.ust.spi.test.event.UserCreated;
-import com.ust.spi.test.handler.*;
+import com.ust.spi.test.handler.CommandExceptionHandler;
+import com.ust.spi.test.handler.RegisterUser;
+import com.ust.spi.test.handler.ResetPassword;
+import com.ust.spi.test.handler.TestExceptionHandler;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

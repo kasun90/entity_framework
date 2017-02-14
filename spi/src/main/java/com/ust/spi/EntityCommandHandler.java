@@ -14,18 +14,18 @@ import java.lang.reflect.ParameterizedType;
  */
 public abstract class EntityCommandHandler<C extends Command<R>, R, E extends Entity>
         implements CommandHandler<C, R> {
-    
+
     private String entityType;
 
     @Inject
-    private EntityRepository<E> entityRepo;
+    private  EntityRepository<E> entityRepo ;
 
     @Inject
-    private RepositoryRegistry repositoryRegistry ;
+    private RepositoryRegistry repositoryRegistry;
 
     @Inject
     private CacheRegistry cacheRegistry;
-    
+
     public EntityCommandHandler() {
         ParameterizedType genericSuperclass = (ParameterizedType) this.getClass().getGenericSuperclass();
         entityType = ((Class) genericSuperclass.getActualTypeArguments()[2]).getName();
@@ -56,6 +56,7 @@ public abstract class EntityCommandHandler<C extends Command<R>, R, E extends En
 
     /**
      * Gets the cache by the entity identifier.
+     *
      * @param entityId the entity id
      * @return the mutable cache
      */
@@ -65,8 +66,9 @@ public abstract class EntityCommandHandler<C extends Command<R>, R, E extends En
 
     /**
      * Gets the readonly cache by the entity type and the entity identifier.
+     *
      * @param entityType the entity type
-     * @param entityId the entity id
+     * @param entityId   the entity id
      * @return the cache
      */
     protected Cache getCache(Class<? extends Entity> entityType, String entityId) {
@@ -75,6 +77,7 @@ public abstract class EntityCommandHandler<C extends Command<R>, R, E extends En
 
     /**
      * Gets the common cache related to the entity type by the entity type.
+     *
      * @param entityType the entity type
      * @return the cache
      */

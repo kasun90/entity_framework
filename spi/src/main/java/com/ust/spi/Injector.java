@@ -11,7 +11,7 @@ import java.lang.reflect.Type;
  * Utility class for the test case {@link EntityCommandHandler} creation.
  */
 public class Injector {
-    
+
     private RepositoryRegistry repositoryRegistry;
     private CacheRegistry cacheRegistry;
 
@@ -22,6 +22,7 @@ public class Injector {
 
     /**
      * Sets the repository registry to inject.
+     *
      * @param repositoryRegistry the repository registry
      */
     public void setRepositoryRegistry(RepositoryRegistry repositoryRegistry) {
@@ -30,6 +31,7 @@ public class Injector {
 
     /**
      * Sets the cache registry to inject.
+     *
      * @param cacheRegistry the cache registry
      */
     public void setCacheRegistry(CacheRegistry cacheRegistry) {
@@ -38,6 +40,7 @@ public class Injector {
 
     /**
      * Gets the repository registry.
+     *
      * @return the repository registry
      */
     public RepositoryRegistry getRepositoryRegistry() {
@@ -46,6 +49,7 @@ public class Injector {
 
     /**
      * Gets the cache registry.
+     *
      * @return the cache registry
      */
     public CacheRegistry getCacheRegistry() {
@@ -88,9 +92,10 @@ public class Injector {
     /**
      * This creates an instance of a {@link EntityEventHandler} injected the {@link EntityRepository} as it
      * repository.
-     * @param cls the {@link EntityEventHandler} type for creating new instance.
-     * @param repo  the repository to be injected to the {@link EntityEventHandler}.
-     * @param <T> the {@link EntityEventHandler} type for creating new instance.
+     *
+     * @param cls  the {@link EntityEventHandler} type for creating new instance.
+     * @param repo the repository to be injected to the {@link EntityEventHandler}.
+     * @param <T>  the {@link EntityEventHandler} type for creating new instance.
      * @return the created {@link EntityEventHandler}
      */
     public <T extends EntityEventHandler> T createListenerInstance(Class<T> cls, EntityRepository repo) {

@@ -1,0 +1,6 @@
+asdasd
+Entity User : This represents a user of the system {
+    String fieldOne          : field one description
+    boolean fieldTwo         : field two description
+}
+==== no/file
