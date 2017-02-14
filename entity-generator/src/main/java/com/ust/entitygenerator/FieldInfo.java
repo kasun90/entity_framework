@@ -1,10 +1,5 @@
 package com.ust.entitygenerator;
 
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.TypeName;
-
-import java.math.BigDecimal;
-
 /**
  * This holds the field information of an object.
  */

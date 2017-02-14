@@ -6,15 +6,14 @@ import org.junit.Assert;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Map;
 
-public class AutogenValidator implements AutoCloseable{
-    String input;
-    String basePath;
+public class AutogenValidator implements AutoCloseable {
+    private String input;
+    private String basePath;
 
     public void validateFile(String filename) throws Exception {
         TestCaseLoader loader = new TestCaseLoader();

@@ -13,7 +13,7 @@ final class EnumInfo {
     private final String name;
     private String javaDoc;
     private final List<String> items = new LinkedList<>();
-    TypeSpec.Builder builder;
+    private TypeSpec.Builder builder;
 
     public EnumInfo(String name) {
         this.name = name;

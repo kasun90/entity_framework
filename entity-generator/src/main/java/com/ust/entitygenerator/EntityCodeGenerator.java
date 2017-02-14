@@ -68,21 +68,21 @@ public final class EntityCodeGenerator {
                 continue;
             }
 
-            switch (split[0]) {
+            switch (split[0].trim()) {
                 case "package":
-                    packageName = split[1];
+                    packageName = split[1].trim();
                     break;
                 case "entity":
-                    entityPath = split[1];
+                    entityPath = split[1].trim();
                     break;
                 case "events":
-                    eventPath = split[1];
+                    eventPath = split[1].trim();
                     break;
                 case "commands":
-                    commandPath = split[1];
+                    commandPath = split[1].trim();
                     break;
                 case "enums":
-                    enumPath = split[1];
+                    enumPath = split[1].trim();
                     break;
                 default:
             }

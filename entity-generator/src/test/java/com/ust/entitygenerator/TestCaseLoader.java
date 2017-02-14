@@ -19,8 +19,8 @@ public class TestCaseLoader {
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             while ((line = reader.readLine()) != null) {
-                if (line.split(" ")[0].equals("====")) {
-                    if (fileName.equals("input")) {
+                if ("====".equals(line.split(" ")[0])) {
+                    if ("input".equals(fileName)) {
                         input = builder.toString();
                     } else {
                         output.put(fileName, builder.toString());

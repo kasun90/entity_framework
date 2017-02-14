@@ -1,16 +1,15 @@
 package com.ust.entitygenerator;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.Map;
 
 public class SchemaParserTest {
 
     AutogenValidator validator;
+
     @Before
     public void begin() {
         validator = new AutogenValidator();

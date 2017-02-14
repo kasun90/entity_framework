@@ -49,6 +49,9 @@ final class SchemaParser {
     private final List<EnumInfo> enumInfos = new LinkedList<>();
     private final String enumPackage;
 
+    private ParsingType parsingType = ParsingType.NO_IN;
+    int lineNumber = 0;
+
     /**
      * The entity parsing type.
      */
@@ -142,16 +145,19 @@ final class SchemaParser {
             if (command.getItemClass() != null) {
                 file = JavaFile.builder(commandPackage, command.getItemClass().getBuilder()
                         .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                        .addSuperinterface(Serializable.class).build()).skipJavaLangImports(true).indent("    ").build();
+                        .addSuperinterface(Serializable.class).build()).skipJavaLangImports(true).indent("    ")
+                        .build();
                 file.writeTo(new File(commandDirectory + srcPath).toPath());
-                System.out.println("CommandResponse     : " + commandPackage + "." + command.getItemClass().getClassName());
+                System.out.println("CommandResponse     : " + commandPackage + "." + command.getItemClass()
+                        .getClassName());
 
                 file = JavaFile.builder(commandPackage, command.getItemClass().getTester()
                         .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                         .addSuperinterface(Serializable.class).build())
                         .skipJavaLangImports(true).indent("    ").build();
                 file.writeTo(new File(commandDirectory + testPath).toPath());
-                System.out.println("CommandResponseTest : " + commandPackage + "." + command.getItemClass().getClassName()
+                System.out.println("CommandResponseTest : " + commandPackage + "." + command.getItemClass()
+                        .getClassName()
                         + "Test");
             }
         }
@@ -169,8 +175,8 @@ final class SchemaParser {
     public void read() throws IOException {
 
         String line;
-        ParsingType parsingType = ParsingType.NO_IN;
-        int lineNumber = 0;
+        parsingType = ParsingType.NO_IN;
+        lineNumber = 0;
         while ((line = reader.readLine()) != null) {
             line = line.trim();
             ++lineNumber;
@@ -178,161 +184,21 @@ final class SchemaParser {
                 continue;
             }
             if (parsingType == ParsingType.NO_IN) {
-                String[] split = line.split(":");
-                if (split.length != 2) {
-                    throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
-                }
-                String[] typeData = split[0].split(" ");
-                if (typeData[0].trim().equals("Entity")) {
-                    parsingType = ParsingType.IN_ENTITY;
-                    String[] types = typeData[1].trim().split("<|>");
-                    entityInfo = new ClassInfo();
-                    entityInfo.setClassName(types[0].trim());
-                    entityInfo.setMapEntity(false);
-                    if (types.length == 2) {
-                        entityInfo.addParentType(types[1].trim());
-                    }
-                    entityInfo.setJavaDoc(split[1].split("\\{")[0].trim());
-                } else if (typeData[0].trim().equals("MapEntity")) {
-                    parsingType = ParsingType.IN_MAP_ENTITY;
-                    String[] types = typeData[1].trim().split("<|>");
-                    entityInfo = new ClassInfo();
-                    entityInfo.setClassName(types[0].trim());
-                    entityInfo.setMapEntity(true);
-                    if (types.length == 2) {
-                        Arrays.stream(types[1].trim().split(",")).map(String::trim)
-                                .forEach(s -> entityInfo.addParentType(s));
-                    }
-                    entityInfo.setJavaDoc(split[1].split("\\{")[0].trim());
-                } else if (typeData[0].trim().equals("Command")) {
-                    parsingType = ParsingType.IN_COMMAND;
-                    String[] types = typeData[1].trim().split("<|>");
-                    commandInfo = new ClassInfo();
-                    commandInfo.setClassName(types[0].trim());
-
-                    if (types.length == 2) {
-                        Arrays.stream(types[1].trim().split(",")).map(String::trim)
-                                .forEach(s -> commandInfo.addParentType(s));
-                    }
-                    commandInfo.setJavaDoc(split[1].split("\\{")[0].trim());
-                } else if (typeData[0].trim().equals("Enum")) {
-                    parsingType = ParsingType.IN_ENUM;
-
-                    enumInfo = new EnumInfo(typeData[1].trim());
-                    enumInfo.setJavaDoc(split[1].split("\\{")[0].trim());
-                } else if (typeData[0].trim().equals("Event")) {
-                    parsingType = ParsingType.IN_EVENT;
-                    eventInfo = new EventInfo(typeData[1].trim(), split[1].split("\\{")[0].trim());
-                }
+                processNotIn(line);
             } else if (parsingType == ParsingType.IN_ENTITY) {
-                if (line.equals("}")) {
-                    parsingType = ParsingType.NO_IN;
-                } else {
-                    String[] split = line.split(":");
-                    if (split.length != 2) {
-                        throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
-                    }
-                    String[] parts = split[0].split(" ");
-                    String dataType = parts[0].trim();
-                    String fieldName = parts[1].trim();
-
-                    if (dataType.equals("apply")) {
-                        entityInfo.getEventApplyInfo().add(new EventApplyInfo(fieldName, split[1].trim()));
-                    } else {
-                        entityInfo.addField(new FieldInfo(fieldName, dataType, split[1].trim(), entityInfo));
-                    }
-                }
+                processInEntity(line);
             } else if (parsingType == ParsingType.IN_COMMAND) {
-                if (line.equals("}")) {
-                    commands.add(commandInfo);
-                    parsingType = ParsingType.NO_IN;
-                } else {
-                    String[] split = line.split(":");
-                    if (split.length != 2) {
-                        throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
-                    }
-                    String[] parts = split[0].split(" ");
-                    String dataType = parts[0].trim();
-                    String fieldName = parts[1].trim();
-                    if (dataType.equals("Response")) {
-                        commandInfo.setItemClass(new ClassInfo());
-                        commandInfo.getItemClass().setClassName(fieldName);
-                        parsingType = ParsingType.IN_COMMAND_RESPONSE;
-                        commandInfo.getItemClass().setJavaDoc(split[1].split("\\{")[0].trim());
-                    } else {
-                        commandInfo.addField(new FieldInfo(fieldName, dataType, split[1].trim(), commandInfo));
-                    }
-                }
+                processInCommand(line);
             } else if (parsingType == ParsingType.IN_MAP_ENTITY) {
-                if (line.equals("}")) {
-                    parsingType = ParsingType.NO_IN;
-                } else {
-                    String[] split = line.split(":");
-                    if (split.length != 2) {
-                        throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
-                    }
-                    String[] parts = split[0].split(" ");
-                    String dataType = parts[0].trim();
-                    String fieldName = parts[1].trim();
-
-                    switch (dataType) {
-                        case "apply":
-                            entityInfo.getEventApplyInfo().add(new EventApplyInfo(fieldName, split[1].trim()));
-                            break;
-                        case "Item":
-                            entityInfo.setItemClass(new ClassInfo());
-                            entityInfo.getItemClass().setClassName(fieldName);
-                            parsingType = ParsingType.IN_MAP_ENTITY_ITEM;
-                            entityInfo.getItemClass().setJavaDoc(split[1].split("\\{")[0].trim());
-                            break;
-                        default:
-                            entityInfo.addField(new FieldInfo(fieldName, dataType, split[1].trim(), entityInfo));
-                            break;
-                    }
-                }
+                processInMapEntity(line);
             } else if (parsingType == ParsingType.IN_MAP_ENTITY_ITEM) {
-                if (line.equals("}")) {
-                    parsingType = ParsingType.IN_MAP_ENTITY;
-                } else {
-                    String[] split = line.split(":");
-                    if (split.length != 2) {
-                        throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
-                    }
-                    String[] parts = split[0].split(" ");
-                    String dataType = parts[0].trim();
-                    String fieldName = parts[1].trim();
-
-                    if (dataType.equals("apply")) {
-                        entityInfo.getItemClass().getEventApplyInfo()
-                                .add(new EventApplyInfo(fieldName, split[1].trim()));
-                    } else {
-                        entityInfo.getItemClass().addField(
-                                new FieldInfo(fieldName, dataType, split[1].trim(), entityInfo.getItemClass()));
-                    }
-                }
+                processInMapEntityItem(line);
             } else if (parsingType == ParsingType.IN_COMMAND_RESPONSE) {
-                if (line.equals("}")) {
-                    parsingType = ParsingType.IN_COMMAND;
-                } else {
-                    String[] split = line.split(":");
-                    if (split.length != 2) {
-                        throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
-                    }
-                    String[] parts = split[0].split(" ");
-                    String dataType = parts[0].trim();
-                    String fieldName = parts[1].trim();
-                    commandInfo.getItemClass().addField(
-                            new FieldInfo(fieldName, dataType, split[1].trim(), commandInfo.getItemClass()));
-                }
+                processInCommandResponse(line);
             } else if (parsingType == ParsingType.IN_ENUM) {
-                if (line.equals("}")) {
-                    parsingType = ParsingType.NO_IN;
-                    enumInfos.add(enumInfo);
-                } else {
-                    enumInfo.getItems().add(line.trim());
-                }
+                processInEnum(line);
             } else {
-                if (line.equals("}")) {
+                if ("}".equals(line)) {
                     parsingType = ParsingType.NO_IN;
                     events.put(eventInfo.getName(), eventInfo);
                 } else {
@@ -350,6 +216,174 @@ final class SchemaParser {
         commands.forEach(info -> generateCommand(info, false));
         enumInfos.forEach(this::generateEnums);
         events.values().forEach(this::generateEvents);
+    }
+
+    private void processInEnum(String line) {
+        if ("}".equals(line)) {
+            parsingType = ParsingType.NO_IN;
+            enumInfos.add(enumInfo);
+        } else {
+            enumInfo.getItems().add(line.trim());
+        }
+    }
+
+    private void processInCommandResponse(String line) {
+        if ("}".equals(line)) {
+            parsingType = ParsingType.IN_COMMAND;
+        } else {
+            String[] split = line.split(":");
+            if (split.length != 2) {
+                throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
+            }
+            String[] parts = split[0].split(" ");
+            String dataType = parts[0].trim();
+            String fieldName = parts[1].trim();
+            commandInfo.getItemClass().addField(
+                    new FieldInfo(fieldName, dataType, split[1].trim(), commandInfo.getItemClass()));
+        }
+    }
+
+    private void processInMapEntityItem(String line) {
+        if ("}".equals(line)) {
+            parsingType = ParsingType.IN_MAP_ENTITY;
+        } else {
+            String[] split = line.split(":");
+            if (split.length != 2) {
+                throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
+            }
+            String[] parts = split[0].split(" ");
+            String dataType = parts[0].trim();
+            String fieldName = parts[1].trim();
+
+            if ("apply".equals(dataType)) {
+                entityInfo.getItemClass().getEventApplyInfo()
+                        .add(new EventApplyInfo(fieldName, split[1].trim()));
+            } else {
+                entityInfo.getItemClass().addField(
+                        new FieldInfo(fieldName, dataType, split[1].trim(), entityInfo.getItemClass()));
+            }
+        }
+    }
+
+    private void processInMapEntity(String line) {
+        if ("}".equals(line)) {
+            parsingType = ParsingType.NO_IN;
+        } else {
+            String[] split = line.split(":");
+            if (split.length != 2) {
+                throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
+            }
+            String[] parts = split[0].split(" ");
+            String dataType = parts[0].trim();
+            String fieldName = parts[1].trim();
+
+            switch (dataType) {
+                case "apply":
+                    entityInfo.getEventApplyInfo().add(new EventApplyInfo(fieldName, split[1].trim()));
+                    break;
+                case "Item":
+                    entityInfo.setItemClass(new ClassInfo());
+                    entityInfo.getItemClass().setClassName(fieldName);
+                    parsingType = ParsingType.IN_MAP_ENTITY_ITEM;
+                    entityInfo.getItemClass().setJavaDoc(split[1].split("\\{")[0].trim());
+                    break;
+                default:
+                    entityInfo.addField(new FieldInfo(fieldName, dataType, split[1].trim(), entityInfo));
+                    break;
+            }
+        }
+    }
+
+    private void processInCommand(String line) {
+        if ("}".equals(line)) {
+            commands.add(commandInfo);
+            parsingType = ParsingType.NO_IN;
+        } else {
+            String[] split = line.split(":");
+            if (split.length != 2) {
+                throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
+            }
+            String[] parts = split[0].split(" ");
+            String dataType = parts[0].trim();
+            String fieldName = parts[1].trim();
+            if ("Response".equals(dataType)) {
+                commandInfo.setItemClass(new ClassInfo());
+                commandInfo.getItemClass().setClassName(fieldName);
+                parsingType = ParsingType.IN_COMMAND_RESPONSE;
+                commandInfo.getItemClass().setJavaDoc(split[1].split("\\{")[0].trim());
+            } else {
+                commandInfo.addField(new FieldInfo(fieldName, dataType, split[1].trim(), commandInfo));
+            }
+        }
+    }
+
+    private void processInEntity(String line) {
+        if ("}".equals(line)) {
+            parsingType = ParsingType.NO_IN;
+        } else {
+            String[] split = line.split(":");
+            if (split.length != 2) {
+                throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
+            }
+            String[] parts = split[0].split(" ");
+            String dataType = parts[0].trim();
+            String fieldName = parts[1].trim();
+
+            if ("apply".equals(dataType)) {
+                entityInfo.getEventApplyInfo().add(new EventApplyInfo(fieldName, split[1].trim()));
+            } else {
+                entityInfo.addField(new FieldInfo(fieldName, dataType, split[1].trim(), entityInfo));
+            }
+        }
+    }
+
+    private void processNotIn(String line) {
+        String[] split = line.split(":");
+        if (split.length != 2) {
+            throw new RuntimeException("Failed to process line " + lineNumber + ".\nLine=" + line);
+        }
+        String[] typeData = split[0].split(" ");
+        if ("Entity".equals(typeData[0].trim())) {
+            parsingType = ParsingType.IN_ENTITY;
+            String[] types = typeData[1].trim().split("<|>");
+            entityInfo = new ClassInfo();
+            entityInfo.setClassName(types[0].trim());
+            entityInfo.setMapEntity(false);
+            if (types.length == 2) {
+                entityInfo.addParentType(types[1].trim());
+            }
+            entityInfo.setJavaDoc(split[1].split("\\{")[0].trim());
+        } else if ("MapEntity".equals(typeData[0].trim())) {
+            parsingType = ParsingType.IN_MAP_ENTITY;
+            String[] types = typeData[1].trim().split("<|>");
+            entityInfo = new ClassInfo();
+            entityInfo.setClassName(types[0].trim());
+            entityInfo.setMapEntity(true);
+            if (types.length == 2) {
+                Arrays.stream(types[1].trim().split(",")).map(String::trim)
+                        .forEach(s -> entityInfo.addParentType(s));
+            }
+            entityInfo.setJavaDoc(split[1].split("\\{")[0].trim());
+        } else if ("Command".equals(typeData[0].trim())) {
+            parsingType = ParsingType.IN_COMMAND;
+            String[] types = typeData[1].trim().split("<|>");
+            commandInfo = new ClassInfo();
+            commandInfo.setClassName(types[0].trim());
+
+            if (types.length == 2) {
+                Arrays.stream(types[1].trim().split(",")).map(String::trim)
+                        .forEach(s -> commandInfo.addParentType(s));
+            }
+            commandInfo.setJavaDoc(split[1].split("\\{")[0].trim());
+        } else if ("Enum".equals(typeData[0].trim())) {
+            parsingType = ParsingType.IN_ENUM;
+
+            enumInfo = new EnumInfo(typeData[1].trim());
+            enumInfo.setJavaDoc(split[1].split("\\{")[0].trim());
+        } else if ("Event".equals(typeData[0].trim())) {
+            parsingType = ParsingType.IN_EVENT;
+            eventInfo = new EventInfo(typeData[1].trim(), split[1].split("\\{")[0].trim());
+        }
     }
 
     private void generateEnums(EnumInfo info) {
@@ -616,7 +650,7 @@ final class SchemaParser {
     }
 
     private String getGetter(String type, String fieldName) {
-        if (type.equals("boolean") || type.equals("Boolean")) {
+        if ("boolean".equals(type) || "Boolean".equals(type)) {
             return "is" + fieldName.toUpperCase().charAt(0) + fieldName.substring(1);
         }
         return "get" + fieldName.toUpperCase().charAt(0) + fieldName.substring(1);

@@ -17,15 +17,11 @@ final class ClassInfo {
     private final List<FieldInfo> fields = new LinkedList<>();
     private final Map<String, FieldInfo> fieldsByName = new HashMap<>();
     private final List<EventApplyInfo> eventApplyInfo = new LinkedList<>();
-    boolean mapEntity = false;
+    private boolean mapEntity = false;
     private ClassInfo itemClass = null;
 
-    TypeSpec.Builder builder;
-    TypeSpec.Builder tester;
-
-    public ClassInfo() {
-
-    }
+    private TypeSpec.Builder builder;
+    private TypeSpec.Builder tester;
 
     public boolean isMapEntity() {
         return mapEntity;
