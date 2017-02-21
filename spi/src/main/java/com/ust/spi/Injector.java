@@ -67,13 +67,13 @@ public class Injector {
     @SuppressWarnings("unchecked")
     public <T extends EntityCommandHandler> T createInstance(Class<T> cls) {
         try {
-            Field entityRepoField = EntityCommandHandler.class.getDeclaredField("entityRepo");
+            Field entityRepoField = EntityHandler.class.getDeclaredField("entityRepo");
             entityRepoField.setAccessible(true);
 
-            Field repositoryRegistryField = EntityCommandHandler.class.getDeclaredField("repositoryRegistry");
+            Field repositoryRegistryField = EntityHandler.class.getDeclaredField("repositoryRegistry");
             repositoryRegistryField.setAccessible(true);
 
-            Field cacheRegistryField = EntityCommandHandler.class.getDeclaredField("cacheRegistry");
+            Field cacheRegistryField = EntityHandler.class.getDeclaredField("cacheRegistry");
             cacheRegistryField.setAccessible(true);
 
             T handler = cls.newInstance();
@@ -98,15 +98,28 @@ public class Injector {
      * @param <T>  the {@link EntityEventHandler} type for creating new instance.
      * @return the created {@link EntityEventHandler}
      */
-    public <T extends EntityEventHandler> T createListenerInstance(Class<T> cls, EntityRepository repo) {
+    @SuppressWarnings("unchecked")
+    public <T extends EntityEventHandler> T createListenerInstance(Class<T> cls) {
         try {
-            Field field = cls.getSuperclass().getDeclaredField("entityRepo");
-            field.setAccessible(true);
+            Field entityRepoField = EntityHandler.class.getDeclaredField("entityRepo");
+            entityRepoField.setAccessible(true);
+
+            Field repositoryRegistryField = EntityHandler.class.getDeclaredField("repositoryRegistry");
+            repositoryRegistryField.setAccessible(true);
+
+            Field cacheRegistryField = EntityHandler.class.getDeclaredField("cacheRegistry");
+            cacheRegistryField.setAccessible(true);
+
             T handler = cls.newInstance();
-            field.set(handler, repo);
+            Type genericFieldType = handler.getClass().getGenericSuperclass();
+            ParameterizedType type = (ParameterizedType) genericFieldType;
+            Class entityTypeClass = (Class) type.getActualTypeArguments()[1];
+            entityRepoField.set(handler, repositoryRegistry.getRepository(entityTypeClass));
+            repositoryRegistryField.set(handler, repositoryRegistry);
+            cacheRegistryField.set(handler, cacheRegistry);
             return handler;
         } catch (NoSuchFieldException | IllegalAccessException | InstantiationException e) {
-            throw new EventException(e);
+            throw new EventException(e); // $COVERAGE-IGNORE$
         }
     }
 }

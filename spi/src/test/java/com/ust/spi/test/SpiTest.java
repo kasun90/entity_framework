@@ -7,12 +7,16 @@ package com.ust.spi.test;
 
 import com.ust.spi.EntityCommandHandler;
 import com.ust.spi.EntityRepository;
+import com.ust.spi.Event;
 import com.ust.spi.Injector;
 import com.ust.spi.MutableCache;
 import com.ust.spi.ex.CommandException;
 import com.ust.spi.ex.EntityException;
+import com.ust.spi.ex.EventException;
 import com.ust.spi.test.command.PasswordResetRequest;
 import com.ust.spi.test.command.UserRegisterRequest;
+import com.ust.spi.test.entity.TestApplyExceptionMapEntity;
+import com.ust.spi.test.entity.TestItemCreateExceptionMapEntity;
 import com.ust.spi.test.entity.TestMapEntity;
 import com.ust.spi.test.entity.User;
 import com.ust.spi.test.event.EntityExceptionCreationEvent;
@@ -22,10 +26,15 @@ import com.ust.spi.test.event.UserCreated;
 import com.ust.spi.test.handler.CommandExceptionHandler;
 import com.ust.spi.test.handler.RegisterUser;
 import com.ust.spi.test.handler.ResetPassword;
+import com.ust.spi.test.handler.TestEventCreateExceptionHandler;
+import com.ust.spi.test.handler.TestEventHandler;
+import com.ust.spi.test.handler.TestEventProcessingExceptionHandler;
 import com.ust.spi.test.handler.TestExceptionHandler;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.stream.Collectors;
 
 @SuppressWarnings("PMD")
 public class SpiTest {
@@ -82,6 +91,7 @@ public class SpiTest {
         TestMapEntity mapEntity = new TestMapEntity();
         mapEntity.applyEvent("1", new PasswordChanged(""));
         Assert.assertEquals(1, mapEntity.getItems().size());
+        Assert.assertEquals(1, mapEntity.stream().collect(Collectors.toList()).size());
     }
 
     @Test
@@ -93,6 +103,21 @@ public class SpiTest {
         } catch (Throwable ex) {
             Assert.assertEquals(EntityException.class, ex.getClass());
         }
+    }
+
+    @Test(expected = EntityException.class)
+    public void mapEntityApplyExceptionEventTest() {
+        TestApplyExceptionMapEntity mapEntity = new TestApplyExceptionMapEntity();
+        Event event = new PasswordChanged("");
+        mapEntity.applyEvent("1", event);
+        Assert.assertEquals(0, mapEntity.getItems().size());
+    }
+
+    @Test(expected = EntityException.class)
+    public void mapEntityItemCreateExceptionEventTest() {
+        TestItemCreateExceptionMapEntity mapEntity = new TestItemCreateExceptionMapEntity();
+        mapEntity.applyEvent("1", new PasswordChanged(""));
+        Assert.assertEquals(0, mapEntity.getItems().size());
     }
 
     @Test(expected = EntityException.class)
@@ -110,9 +135,12 @@ public class SpiTest {
     @Test
     public void user_create_test() {
         User user = new User();
-        user.applyEvent(new UserCreated("nuwan", "ust123"));
+        UserCreated event = new UserCreated("nuwan", "ust123");
+        user.applyEvent(event);
         Assert.assertEquals("nuwan", user.getUsername());
         Assert.assertEquals("ust123", user.getPassword());
+        Assert.assertEquals(1, user.getEvents().size());
+        Assert.assertNotEquals(0L, event.getTime());
     }
 
     @Test
@@ -122,12 +150,6 @@ public class SpiTest {
         user.applyEvent(new PasswordChanged("nuwan123"));
         Assert.assertEquals("nuwan", user.getUsername());
         Assert.assertEquals("nuwan123", user.getPassword());
-    }
-
-    private User given_user(String username, String password) {
-        User user = new User();
-        user.applyEvent(new UserCreated(username, password));
-        return user;
     }
 
     @Test
@@ -170,6 +192,47 @@ public class SpiTest {
         Assert.assertEquals("nuwan123", user.getPassword());
     }
 
+    private User given_user(String username, String password) {
+        User user = new User();
+        user.applyEvent(new UserCreated(username, password));
+        return user;
+    }
+
+    @Test
+    public void ownCacheTest() throws Exception {
+        InMemoryCacheRegistry reg = new InMemoryCacheRegistry();
+
+        EntityCommandHandler<UserRegisterRequest, UserResponse, User> resetPassword
+                = injector.createInstance(ownCacheTestClass1.class);
+        resetPassword.execute(new UserRegisterRequest("test", "best"));
+        resetPassword = injector.createInstance(ownCacheTestClass2.class);
+        resetPassword.execute(new UserRegisterRequest("test", "best"));
+    }
+
+    @Test
+    public void eventHandlerTest() {
+        InMemoryInjector injector = new InMemoryInjector();
+        TestEventHandler listenerInstance = injector.createListenerInstance(TestEventHandler.class);
+        listenerInstance.onEvent(new UserCreated("simple", "dimple"));
+        Assert.assertEquals("simple", listenerInstance.getEvent().getUsername());
+        Assert.assertEquals("dimple", listenerInstance.getEvent().getPassword());
+    }
+
+    @Test(expected = EventException.class)
+    public void eventCreateExceptionHandlerTest() {
+        InMemoryInjector injector = new InMemoryInjector();
+        TestEventCreateExceptionHandler listenerInstance
+                = injector.createListenerInstance(TestEventCreateExceptionHandler.class);
+    }
+
+    @Test(expected = EventException.class)
+    public void eventProcessExceptionHandlerTest() {
+        InMemoryInjector injector = new InMemoryInjector();
+        TestEventProcessingExceptionHandler listenerInstance
+                = injector.createListenerInstance(TestEventProcessingExceptionHandler.class);
+        listenerInstance.onEvent(new UserCreated("simple", "dimple"));
+    }
+
     public static class ownCacheTestClass1 extends EntityCommandHandler<UserRegisterRequest, UserResponse, User> {
 
         @Override
@@ -192,15 +255,5 @@ public class SpiTest {
             Assert.assertEquals("BOT", getCache(User.class).get("lot"));
             return null;
         }
-    }
-
-    @Test
-    public void ownCacheTest() throws Exception {
-        InMemoryCacheRegistry reg = new InMemoryCacheRegistry();
-
-        EntityCommandHandler<UserRegisterRequest, UserResponse, User> resetPassword = injector.createInstance(ownCacheTestClass1.class);
-        resetPassword.execute(new UserRegisterRequest("test", "best"));
-        resetPassword = injector.createInstance(ownCacheTestClass2.class);
-        resetPassword.execute(new UserRegisterRequest("test", "best"));
     }
 }

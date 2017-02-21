@@ -4,10 +4,10 @@ import com.ust.spi.MapEntity;
 import com.ust.spi.test.event.UserCreated;
 
 @SuppressWarnings("unused")
-public class TestMapEntity extends MapEntity<EntityItem, User> {
+public class TestApplyExceptionMapEntity extends MapEntity<EntityApplyExceptionItem, User> {
 
-    public TestMapEntity() {
-        super(EntityItem.class);
+    public TestApplyExceptionMapEntity() {
+        super(EntityApplyExceptionItem.class);
     }
 
     @Override

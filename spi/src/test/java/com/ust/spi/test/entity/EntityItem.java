@@ -1,4 +1,4 @@
-package com.ust.spi.test;
+package com.ust.spi.test.entity;
 
 import com.ust.spi.test.event.PasswordChanged;
 
