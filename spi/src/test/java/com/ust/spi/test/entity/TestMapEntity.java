@@ -15,8 +15,9 @@ public class TestMapEntity extends MapEntity<EntityItem, User> {
         return "";
     }
 
+    // No need to implement this
     private void apply(UserCreated event) {
-
+        // No need to implement this
     }
 }
 

@@ -39,7 +39,8 @@ public class JsonStreamTest {
 
     private void loadData() throws FileNotFoundException, IOException {
         Gson gson = new Gson();
-        try (BufferedReader reader = new BufferedReader(new FileReader("target/classes/data.json"))) {
+        String file = ClassLoader.getSystemResource("data.json").getFile();
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line = null;
             while ((line = reader.readLine()) != null) {
                 JsonObject json = gson.fromJson(line, JsonObject.class);

@@ -53,6 +53,7 @@ public final class OrderBook extends MapEntity<OpenOrder, Order> implements Seri
 
     /**
      * Returns a string representation of the object.
+     *
      * @return a string representation of the object
      */
     @Override
@@ -102,6 +103,7 @@ public final class OpenOrder implements Serializable {
 
     /**
      * Returns a string representation of the object.
+     *
      * @return a string representation of the object
      */
     @Override
@@ -192,6 +194,7 @@ public final class OrderBookCreated extends Event implements Serializable {
 
     /**
      * Returns a string representation of the object.
+     *
      * @return a string representation of the object
      */
     @Override
@@ -251,6 +254,7 @@ public final class OrderAdded extends Event implements Serializable {
 
     /**
      * Returns a string representation of the object.
+     *
      * @return a string representation of the object
      */
     @Override

@@ -466,7 +466,7 @@ final class SchemaParser {
                 .returns(String.class)
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Override.class)
-                .addJavadoc("Returns a string representation of the object.\n"
+                .addJavadoc("Returns a string representation of the object.\n\n"
                         + "@return a string representation of the object\n")
                 .addCode("return $T.getToString(this);\n", SpiUtils.class).build());
     }

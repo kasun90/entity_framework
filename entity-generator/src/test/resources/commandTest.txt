@@ -57,6 +57,7 @@ public final class RegisterUser implements Command<RegisterStatus>, Serializable
 
     /**
      * Returns a string representation of the object.
+     *
      * @return a string representation of the object
      */
     @Override
@@ -103,6 +104,7 @@ public final class RegisterStatus implements Serializable {
 
     /**
      * Returns a string representation of the object.
+     *
      * @return a string representation of the object
      */
     @Override

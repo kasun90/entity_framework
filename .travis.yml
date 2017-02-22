@@ -9,8 +9,7 @@ before_install:
   - mvn versions:set versions:commit -DnewVersion="1.0"
 
 after_success:
-  - ~/jpm/bin/codacy-coverage-reporter -l Java -r ./spi/target/site/jacoco/jacoco.xml
-  - ~/jpm/bin/codacy-coverage-reporter -l Java -r ./storage/target/site/jacoco/jacoco.xml
-  - ~/jpm/bin/codacy-coverage-reporter -l Java -r ./query/target/site/jacoco/jacoco.xml
+  - chmod 777 scripts/*
+  - ./scripts/upload-coverage.sh
   - echo "<settings><servers><server><id>maven-s3-release-repo</id><username>\${env.ARTIFACTS_KEY}</username><password>\${env.ARTIFACTS_SECRET}</password></server><server><id>maven-s3-snapshot-repo</id><username>\${env.ARTIFACTS_KEY}</username><password>\${env.ARTIFACTS_SECRET}</password></server></servers></settings>" > ~/settings.xml
   - mvn deploy --settings ~/settings.xml
