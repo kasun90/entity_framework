@@ -33,6 +33,7 @@ public abstract class Event {
 
     /**
      * Gets the time of the {@code Event} initiated.
+     *
      * @return the event time
      */
     public long getTime() {

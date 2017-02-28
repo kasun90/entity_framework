@@ -50,8 +50,8 @@ public interface MutableCache extends Cache {
      * @param key             key with which the specified value is to be associated
      * @param mappingFunction the function to compute a value
      * @param <T>             the value type
-     * @return the current (existing or computed) value associated with the specified key,
-     *         or null if the computed value is null
+     * @return the current (existing or computed) value associated with the specified key, or null if the computed value
+     * is null
      */
     default <T> T computeIfAbsent(String key, Function<String, ? extends T> mappingFunction) {
         Objects.requireNonNull(mappingFunction);

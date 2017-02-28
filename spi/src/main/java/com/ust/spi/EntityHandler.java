@@ -1,6 +1,8 @@
 package com.ust.spi;
 
 import com.ust.spi.annotation.Inject;
+import com.ust.spi.logger.ILogger;
+import com.ust.spi.logger.Logger;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -8,13 +10,17 @@ import java.lang.reflect.Type;
 /**
  * The entity related execution handler. This provides the repository, cache and other underlying infrastructure for
  * executing.
+ *
  * @param <E> the EntityType
  */
-public abstract class EntityHandler<E extends Entity> {
+public abstract class EntityHandler<E extends Entity> implements ILogger {
     private String entityType;
 
     @Inject
-    private  EntityRepository<E> entityRepo ;
+    private Logger logger;
+
+    @Inject
+    private EntityRepository<E> entityRepo;
 
     @Inject
     private RepositoryRegistry repositoryRegistry;
@@ -77,5 +83,10 @@ public abstract class EntityHandler<E extends Entity> {
      */
     protected Cache getCache(Class<? extends Entity> entityType) {
         return cacheRegistry.getCache(entityType.getName() + ":" + entityType.getName());
+    }
+
+    @Override
+    public Logger getLogger() {
+        return logger;
     }
 }

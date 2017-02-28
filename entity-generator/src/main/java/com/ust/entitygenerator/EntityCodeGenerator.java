@@ -1,5 +1,7 @@
 package com.ust.entitygenerator;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -74,25 +76,31 @@ public final class EntityCodeGenerator {
                     packageName = split[1].trim();
                     break;
                 case "entity":
-                    entityPath = split[1].trim();
+                    entityPath = System.getProperty("user.dir") + split[1].trim();
                     break;
                 case "events":
-                    eventPath = split[1].trim();
+                    eventPath = System.getProperty("user.dir") + split[1].trim();
                     break;
                 case "commands":
-                    commandPath = split[1].trim();
+                    commandPath = System.getProperty("user.dir") + split[1].trim();
                     break;
                 case "enums":
-                    enumPath = split[1].trim();
+                    enumPath = System.getProperty("user.dir") + split[1].trim();
                     break;
                 default:
             }
         }
 
         File dir = new File(args[0]).getParentFile();
-        parseDir(dir, packageName, "", System.getProperty("user.dir") + entityPath,
-                System.getProperty("user.dir") + eventPath,
-                System.getProperty("user.dir") + commandPath,
-                System.getProperty("user.dir") + enumPath);
+
+        FileUtils.deleteDirectory(new File(entityPath + "/src/main/java"));
+        FileUtils.deleteDirectory(new File(entityPath + "/src/test/java"));
+        FileUtils.deleteDirectory(new File(eventPath + "/src/main/java"));
+        FileUtils.deleteDirectory(new File(eventPath + "/src/test/java"));
+        FileUtils.deleteDirectory(new File(commandPath + "/src/main/java"));
+        FileUtils.deleteDirectory(new File(commandPath + "/src/test/java"));
+        FileUtils.deleteDirectory(new File(enumPath + "/src/main/java"));
+        FileUtils.deleteDirectory(new File(enumPath + "/src/test/java"));
+        parseDir(dir, packageName, "", entityPath, eventPath, commandPath, enumPath);
     }
 }

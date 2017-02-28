@@ -23,6 +23,7 @@ public final class SpiUtils {
 
     /**
      * Convert {@link Object} to {@link String}.
+     *
      * @param object the object to be converted
      * @return the string representation.
      */

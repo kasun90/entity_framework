@@ -64,6 +64,7 @@ public class SpiTest {
         Injector injector = new InMemoryInjector();
         Assert.assertNotNull(injector.getRepositoryRegistry());
         Assert.assertNotNull(injector.getCacheRegistry());
+        Assert.assertNotNull(injector.getLogger());
     }
 
     @Test

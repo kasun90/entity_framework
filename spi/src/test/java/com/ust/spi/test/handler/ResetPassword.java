@@ -15,6 +15,8 @@ public class ResetPassword extends EntityCommandHandler<PasswordResetRequest, Us
             return new UserResponse("user not found");
         }
         user.applyEvent(new PasswordChanged(cmd.getPassword()));
+        info("test");
+
         return new UserResponse("");
     }
 

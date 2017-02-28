@@ -16,6 +16,7 @@ public final class CommandStatus {
 
     /**
      * Gets the status of the command execution.
+     *
      * @return the status
      */
     public boolean isSuccess() {
@@ -24,6 +25,7 @@ public final class CommandStatus {
 
     /**
      * Gets the description of the command execution.
+     *
      * @return the description
      */
     public String getDescription() {
@@ -32,6 +34,7 @@ public final class CommandStatus {
 
     /**
      * Static function to create success response.
+     *
      * @return the Command Status
      */
     public static CommandStatus succeeded() {
