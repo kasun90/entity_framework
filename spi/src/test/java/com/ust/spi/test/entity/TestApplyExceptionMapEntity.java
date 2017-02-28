@@ -16,7 +16,7 @@ public class TestApplyExceptionMapEntity extends MapEntity<EntityApplyExceptionI
     }
 
     private void apply(UserCreated event) {
-
+        System.out.printf("applied UserCreated event");
     }
 }
 
