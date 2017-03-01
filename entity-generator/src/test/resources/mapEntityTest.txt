@@ -213,25 +213,16 @@ import java.io.Serializable;
  * gsdsdgs dfsd fsdfsdfsd.
  */
 public final class OrderAdded extends Event implements Serializable {
-    private final String instId;
-
     private final String userId;
+
+    private final String instId;
 
     private final String email;
 
-    public OrderAdded(final String instId, final String userId, final String email) {
-        this.instId = instId;
+    public OrderAdded(final String userId, final String instId, final String email) {
         this.userId = userId;
+        this.instId = instId;
         this.email = email;
-    }
-
-    /**
-     * Gets user identifier.
-     *
-     * @return instId the order book.
-     */
-    public String getInstId() {
-        return instId;
     }
 
     /**
@@ -241,6 +232,15 @@ public final class OrderAdded extends Event implements Serializable {
      */
     public String getUserId() {
         return userId;
+    }
+
+    /**
+     * Gets user identifier.
+     *
+     * @return instId the order book.
+     */
+    public String getInstId() {
+        return instId;
     }
 
     /**

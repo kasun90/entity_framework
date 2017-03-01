@@ -3,6 +3,8 @@ package com.ust.entitygenerator;
 import com.squareup.javapoet.TypeSpec;
 
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -11,7 +13,7 @@ import java.util.Set;
 final class EventInfo {
     private final String name;
     private final String javaDoc;
-    private final Set<String> fields = new HashSet<>();
+    private final List<FieldInfo> fields = new LinkedList<>();
     private TypeSpec.Builder builder = null;
     private TypeSpec.Builder tester = null;
 
@@ -28,7 +30,7 @@ final class EventInfo {
         return name;
     }
 
-    public Set<String> getFields() {
+    public List<FieldInfo> getFields() {
         return fields;
     }
 

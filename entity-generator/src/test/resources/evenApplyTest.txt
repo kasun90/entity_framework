@@ -9,6 +9,11 @@ Event DetailsChanged : this changes details {
     name
     age
 }
+
+Event AmountChanged : this changes details {
+    name
+    BigDecimal amount : the amount
+}
 ==== src/main/java/entity/User.java
 package entity;
 
@@ -120,6 +125,55 @@ public final class DetailsChanged extends Event implements Serializable {
      */
     public int getAge() {
         return age;
+    }
+
+    /**
+     * Returns a string representation of the object.
+     *
+     * @return a string representation of the object
+     */
+    @Override
+    public String toString() {
+        return SpiUtils.getToString(this);
+    }
+}
+==== src/main/java/events/AmountChanged.java
+package events;
+
+import com.ust.spi.Event;
+import com.ust.spi.utils.SpiUtils;
+import java.io.Serializable;
+import java.math.BigDecimal;
+
+/**
+ * this changes details.
+ */
+public final class AmountChanged extends Event implements Serializable {
+    private final String name;
+
+    private final BigDecimal amount;
+
+    public AmountChanged(final String name, final BigDecimal amount) {
+        this.name = name;
+        this.amount = amount;
+    }
+
+    /**
+     * Gets name description.
+     *
+     * @return name the user.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Gets the amount.
+     *
+     * @return amount the user.
+     */
+    public BigDecimal getAmount() {
+        return amount;
     }
 
     /**

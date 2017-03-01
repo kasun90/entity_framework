@@ -49,6 +49,7 @@ final class SchemaParser {
     private EnumInfo enumInfo = null;
     private final List<EnumInfo> enumInfos = new LinkedList<>();
     private final String enumPackage;
+    private Map<String, FieldInfo> fields = new HashMap<>();
 
     private ParsingType parsingType = ParsingType.NO_IN;
     private int lineNumber = 0;
@@ -206,7 +207,17 @@ final class SchemaParser {
                     parsingType = ParsingType.NO_IN;
                     events.put(eventInfo.getName(), eventInfo);
                 } else {
-                    eventInfo.getFields().add(line.trim());
+                    FieldInfo fieldInfo = fields.get(line.trim());
+                    if (fieldInfo != null) {
+                        eventInfo.getFields().add(fieldInfo);
+                    } else {
+                        String[] split = line.trim().split(":");
+                        String[] parts = split[0].split(" ");
+                        String dataType = parts[0].trim();
+                        String fieldName = parts[1].trim();
+                        eventInfo.getFields()
+                                .add(new FieldInfo(fieldName, dataType, split[1].trim(), entityInfo));
+                    }
                 }
             }
         }
@@ -263,8 +274,10 @@ final class SchemaParser {
                 entityInfo.getItemClass().getEventApplyInfo()
                         .add(new EventApplyInfo(fieldName, split[1].trim()));
             } else {
+                FieldInfo fieldInfo = new FieldInfo(fieldName, dataType, split[1].trim(), entityInfo.getItemClass());
+                fields.put(fieldInfo.getFieldName(), fieldInfo);
                 entityInfo.getItemClass().addField(
-                        new FieldInfo(fieldName, dataType, split[1].trim(), entityInfo.getItemClass()));
+                        fieldInfo);
             }
         }
     }
@@ -292,7 +305,9 @@ final class SchemaParser {
                     entityInfo.getItemClass().setJavaDoc(getJavaDoc(line));
                     break;
                 default:
-                    entityInfo.addField(new FieldInfo(fieldName, dataType, split[1].trim(), entityInfo));
+                    FieldInfo fieldInfo = new FieldInfo(fieldName, dataType, split[1].trim(), entityInfo);
+                    fields.put(fieldInfo.getFieldName(), fieldInfo);
+                    entityInfo.addField(fieldInfo);
                     break;
             }
         }
@@ -336,7 +351,9 @@ final class SchemaParser {
             if ("apply".equals(dataType)) {
                 entityInfo.getEventApplyInfo().add(new EventApplyInfo(fieldName, split[1].trim()));
             } else {
-                entityInfo.addField(new FieldInfo(fieldName, dataType, split[1].trim(), entityInfo));
+                FieldInfo fieldInfo = new FieldInfo(fieldName, dataType, split[1].trim(), entityInfo);
+                fields.put(fieldInfo.getFieldName(), fieldInfo);
+                entityInfo.addField(fieldInfo);
             }
         }
     }
@@ -476,10 +493,10 @@ final class SchemaParser {
             EventInfo eventInfo = events.get(eventApplyInfo.getEventName());
 
             StringBuilder eventApplyBuilder = new StringBuilder();
-            for (String field : eventInfo.getFields()) {
-                if (!item || entityInfo.getItemClass().getFieldInfo(field) != null) {
-                    eventApplyBuilder.append("this.").append(field).append(" = event.")
-                            .append(getGetter(classInfo.getFieldInfo(field).getDataType(), field)).append("();\n");
+            for (FieldInfo field : eventInfo.getFields()) {
+                if (!item || entityInfo.getItemClass().getFieldInfo(field.getFieldName()) != null) {
+                    eventApplyBuilder.append("this.").append(field.getFieldName()).append(" = event.")
+                            .append(getGetter(field.getDataType(), field.getFieldName())).append("();\n");
                 }
             }
 
@@ -594,11 +611,7 @@ final class SchemaParser {
         builder.addJavadoc(info.getJavaDoc() + "\n");
         MethodSpec.Builder constructor = MethodSpec.constructorBuilder().addModifiers(Modifier.PUBLIC);
 
-        for (String s : info.getFields()) {
-            FieldInfo fieldInfo = entityInfo.getFieldInfo(s);
-            if (entityInfo.isMapEntity() && fieldInfo == null) {
-                fieldInfo = entityInfo.getItemClass().getFieldInfo(s);
-            }
+        for (FieldInfo fieldInfo : info.getFields()) {
             builder.addField(FieldSpec.builder(getType(fieldInfo.getDataType()),
                     fieldInfo.getFieldName(), Modifier.PRIVATE, Modifier.FINAL).build());
             builder.addMethod(MethodSpec.methodBuilder(getGetter(fieldInfo.getDataType(), fieldInfo.getFieldName()))
