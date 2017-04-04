@@ -1,0 +1,114 @@
+Command RegisterUser<RegisterStatus> : This represents a user of the system {
+    String userId       : user identifier
+    String email       : user identifier
+
+    Response RegisterStatus : Ayyoooooo {
+		String userId       : user identifier
+		String email        : user identifier
+	}
+}
+==== src/main/java/commands/RegisterUser.java
+package commands;
+
+import com.ust.spi.Command;
+import com.ust.spi.utils.SpiUtils;
+import java.io.Serializable;
+
+/**
+ * This represents a user of the system.
+ */
+public final class RegisterUser implements Command<RegisterStatus>, Serializable {
+    private final String userId;
+
+    private final String email;
+
+    public RegisterUser(final String userId, final String email) {
+        this.userId = userId;
+        this.email = email;
+    }
+
+    /**
+     * Gets the unique identifier of the {@link Command}.
+     *
+     * @return the command key
+     */
+    @Override
+    public String getKey() {
+        return userId;
+    }
+
+    /**
+     * Gets user identifier.
+     *
+     * @return userId the register user.
+     */
+    public String getUserId() {
+        return userId;
+    }
+
+    /**
+     * Gets user identifier.
+     *
+     * @return email the register user.
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * Returns a string representation of the object.
+     *
+     * @return a string representation of the object
+     */
+    @Override
+    public String toString() {
+        return SpiUtils.getToString(this);
+    }
+}
+==== src/main/java/commands/RegisterStatus.java
+package commands;
+
+import com.ust.spi.utils.SpiUtils;
+import java.io.Serializable;
+
+/**
+ * Ayyoooooo.
+ */
+public final class RegisterStatus implements Serializable {
+    private final String userId;
+
+    private final String email;
+
+    public RegisterStatus(final String userId, final String email) {
+        this.userId = userId;
+        this.email = email;
+    }
+
+    /**
+     * Gets user identifier.
+     *
+     * @return userId the register status.
+     */
+    public String getUserId() {
+        return userId;
+    }
+
+    /**
+     * Gets user identifier.
+     *
+     * @return email the register status.
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * Returns a string representation of the object.
+     *
+     * @return a string representation of the object
+     */
+    @Override
+    public String toString() {
+        return SpiUtils.getToString(this);
+    }
+}

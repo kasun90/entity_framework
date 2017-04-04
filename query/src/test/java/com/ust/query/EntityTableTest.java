@@ -22,7 +22,8 @@ public class EntityTableTest {
         Class.forName("org.apache.calcite.jdbc.Driver");
         Properties info = new Properties();
         info.setProperty("lex", "JAVA");
-        connection = DriverManager.getConnection("jdbc:calcite:model=target/classes/model.json", info);
+        String file = ClassLoader.getSystemResource("model.json").getFile();
+        connection = DriverManager.getConnection("jdbc:calcite:model=" + file, info);
     }
 
     @After

@@ -1,0 +1,264 @@
+MapEntity OrderBook<OpenOrder,Order> : This represents a user of the system {
+    String instId       : user identifier
+
+    apply OrderBookCreated : Grrrrrrrrrrrrrrrrrrrr
+
+    Item OpenOrder : Ayyoooooo {
+    	String userId       : user identifier
+    	String email        : user identifier
+    	String address      : user identifier
+    	BigDecimal age      : sdfsd sfd sfs df
+    	int value           : sdf fs fsdf sdf sdf sd
+
+    	apply OrderAdded : Grrrrrrrrrrrrrrrrrrrr
+    }
+}
+
+Event OrderBookCreated : gsdsdgs dfsd fsdfsdfsd {
+    instId
+}
+
+Event OrderAdded : gsdsdgs dfsd fsdfsdfsd{
+    userId
+    instId
+    email
+}
+==== src/main/java/entity/OrderBook.java
+package entity;
+
+import com.ust.spi.MapEntity;
+import com.ust.spi.utils.SpiUtils;
+import events.OrderBookCreated;
+import java.io.Serializable;
+
+/**
+ * This represents a user of the system.
+ */
+public final class OrderBook extends MapEntity<OpenOrder, Order> implements Serializable {
+    private String instId;
+
+    public OrderBook() {
+        super(OpenOrder.class);
+    }
+
+    /**
+     * Gets the unique identifier of the {@link MapEntity}.
+     *
+     * @return the entity id
+     */
+    @Override
+    public String getId() {
+        return instId;
+    }
+
+    /**
+     * Returns a string representation of the object.
+     *
+     * @return a string representation of the object
+     */
+    @Override
+    public String toString() {
+        return SpiUtils.getToString(this);
+    }
+
+    /**
+     * Gets user identifier.
+     *
+     * @return instId the order book.
+     */
+    public String getInstId() {
+        return instId;
+    }
+
+    /**
+     * Grrrrrrrrrrrrrrrrrrrr.
+     *
+     * @param event the event to be applied
+     */
+    public void apply(final OrderBookCreated event) {
+        this.instId = event.getInstId();
+    }
+}
+==== src/main/java/entity/OpenOrder.java
+package entity;
+
+import com.ust.spi.utils.SpiUtils;
+import events.OrderAdded;
+import java.io.Serializable;
+import java.math.BigDecimal;
+
+/**
+ * Ayyoooooo.
+ */
+public final class OpenOrder implements Serializable {
+    private String userId;
+
+    private String email;
+
+    private String address;
+
+    private BigDecimal age;
+
+    private int value;
+
+    /**
+     * Returns a string representation of the object.
+     *
+     * @return a string representation of the object
+     */
+    @Override
+    public String toString() {
+        return SpiUtils.getToString(this);
+    }
+
+    /**
+     * Gets user identifier.
+     *
+     * @return userId the open order.
+     */
+    public String getUserId() {
+        return userId;
+    }
+
+    /**
+     * Gets user identifier.
+     *
+     * @return email the open order.
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * Gets user identifier.
+     *
+     * @return address the open order.
+     */
+    public String getAddress() {
+        return address;
+    }
+
+    /**
+     * Gets sdfsd sfd sfs df.
+     *
+     * @return age the open order.
+     */
+    public BigDecimal getAge() {
+        return age;
+    }
+
+    /**
+     * Gets sdf fs fsdf sdf sdf sd.
+     *
+     * @return value the open order.
+     */
+    public int getValue() {
+        return value;
+    }
+
+    /**
+     * Grrrrrrrrrrrrrrrrrrrr.
+     *
+     * @param event the event to be applied
+     */
+    public void apply(final OrderAdded event) {
+        this.userId = event.getUserId();
+        this.email = event.getEmail();
+    }
+}
+==== src/main/java/events/OrderBookCreated.java
+package events;
+
+import com.ust.spi.Event;
+import com.ust.spi.utils.SpiUtils;
+import java.io.Serializable;
+
+/**
+ * gsdsdgs dfsd fsdfsdfsd.
+ */
+public final class OrderBookCreated extends Event implements Serializable {
+    private final String instId;
+
+    public OrderBookCreated(final String instId) {
+        this.instId = instId;
+    }
+
+    /**
+     * Gets user identifier.
+     *
+     * @return instId the order book.
+     */
+    public String getInstId() {
+        return instId;
+    }
+
+    /**
+     * Returns a string representation of the object.
+     *
+     * @return a string representation of the object
+     */
+    @Override
+    public String toString() {
+        return SpiUtils.getToString(this);
+    }
+}
+==== src/main/java/events/OrderAdded.java
+package events;
+
+import com.ust.spi.Event;
+import com.ust.spi.utils.SpiUtils;
+import java.io.Serializable;
+
+/**
+ * gsdsdgs dfsd fsdfsdfsd.
+ */
+public final class OrderAdded extends Event implements Serializable {
+    private final String instId;
+
+    private final String userId;
+
+    private final String email;
+
+    public OrderAdded(final String instId, final String userId, final String email) {
+        this.instId = instId;
+        this.userId = userId;
+        this.email = email;
+    }
+
+    /**
+     * Gets user identifier.
+     *
+     * @return instId the order book.
+     */
+    public String getInstId() {
+        return instId;
+    }
+
+    /**
+     * Gets user identifier.
+     *
+     * @return userId the open order.
+     */
+    public String getUserId() {
+        return userId;
+    }
+
+    /**
+     * Gets user identifier.
+     *
+     * @return email the open order.
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * Returns a string representation of the object.
+     *
+     * @return a string representation of the object
+     */
+    @Override
+    public String toString() {
+        return SpiUtils.getToString(this);
+    }
+}

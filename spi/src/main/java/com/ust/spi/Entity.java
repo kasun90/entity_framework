@@ -88,5 +88,4 @@ public abstract class Entity<E extends Entity> {
                 .filter(method -> method.getParameterTypes().length == 1)
                 .collect(Collectors.toMap(method -> method.getParameterTypes()[0], Function.identity()));
     }
-
 }

@@ -1,9 +1,6 @@
 package com.ust.spi.test.entity;
 
 import com.ust.spi.MapEntity;
-
-import com.ust.spi.test.EntityItem;
-
 import com.ust.spi.test.event.UserCreated;
 
 @SuppressWarnings("unused")
@@ -18,8 +15,9 @@ public class TestMapEntity extends MapEntity<EntityItem, User> {
         return "";
     }
 
+    // No need to implement this
     private void apply(UserCreated event) {
-
+        // No need to implement this
     }
 }
 

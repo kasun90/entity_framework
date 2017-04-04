@@ -1,0 +1,134 @@
+Entity User : This represents a user of the system {
+    String name          : name description
+    boolean created      : created description
+    int age              : age description
+    apply DetailsChanged : apply detail changes
+}
+
+Event DetailsChanged : this changes details {
+    name
+    age
+}
+==== src/main/java/entity/User.java
+package entity;
+
+import com.ust.spi.Entity;
+import com.ust.spi.utils.SpiUtils;
+import events.DetailsChanged;
+import java.io.Serializable;
+
+/**
+ * This represents a user of the system.
+ */
+public final class User extends Entity implements Serializable {
+    private String name;
+
+    private boolean created;
+
+    private int age;
+
+    /**
+     * Gets the unique identifier of the {@link Entity}.
+     *
+     * @return the entity id
+     */
+    @Override
+    public String getId() {
+        return name;
+    }
+
+    /**
+     * Returns a string representation of the object.
+     *
+     * @return a string representation of the object
+     */
+    @Override
+    public String toString() {
+        return SpiUtils.getToString(this);
+    }
+
+    /**
+     * Gets name description.
+     *
+     * @return name the user.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Gets created description.
+     *
+     * @return created the user.
+     */
+    public boolean isCreated() {
+        return created;
+    }
+
+    /**
+     * Gets age description.
+     *
+     * @return age the user.
+     */
+    public int getAge() {
+        return age;
+    }
+
+    /**
+     * apply detail changes.
+     *
+     * @param event the event to be applied
+     */
+    public void apply(final DetailsChanged event) {
+        this.name = event.getName();
+        this.age = event.getAge();
+    }
+}
+==== src/main/java/events/DetailsChanged.java
+package events;
+
+import com.ust.spi.Event;
+import com.ust.spi.utils.SpiUtils;
+import java.io.Serializable;
+
+/**
+ * this changes details.
+ */
+public final class DetailsChanged extends Event implements Serializable {
+    private final String name;
+
+    private final int age;
+
+    public DetailsChanged(final String name, final int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    /**
+     * Gets name description.
+     *
+     * @return name the user.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Gets age description.
+     *
+     * @return age the user.
+     */
+    public int getAge() {
+        return age;
+    }
+
+    /**
+     * Returns a string representation of the object.
+     *
+     * @return a string representation of the object
+     */
+    @Override
+    public String toString() {
+        return SpiUtils.getToString(this);
+    }
+}

@@ -2,6 +2,7 @@ package com.ust.spi;
 
 import com.ust.spi.ex.CommandException;
 import com.ust.spi.ex.EventException;
+import com.ust.spi.logger.Logger;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -11,17 +12,38 @@ import java.lang.reflect.Type;
  * Utility class for the test case {@link EntityCommandHandler} creation.
  */
 public class Injector {
-    
+
     private RepositoryRegistry repositoryRegistry;
     private CacheRegistry cacheRegistry;
+    private Logger logger;
 
-    public Injector(RepositoryRegistry repositoryRegistry, CacheRegistry cacheRegistry) {
+    public Injector(RepositoryRegistry repositoryRegistry, CacheRegistry cacheRegistry, Logger logger) {
         setRepositoryRegistry(repositoryRegistry);
         setCacheRegistry(this.cacheRegistry = cacheRegistry);
+        setLogger(logger);
+    }
+
+    /**
+     * Gets the logger.
+     *
+     * @return the logger
+     */
+    public Logger getLogger() {
+        return logger;
+    }
+
+    /**
+     * Sets the logger to inject.
+     *
+     * @param logger the logger
+     */
+    public void setLogger(Logger logger) {
+        this.logger = logger;
     }
 
     /**
      * Sets the repository registry to inject.
+     *
      * @param repositoryRegistry the repository registry
      */
     public void setRepositoryRegistry(RepositoryRegistry repositoryRegistry) {
@@ -30,6 +52,7 @@ public class Injector {
 
     /**
      * Sets the cache registry to inject.
+     *
      * @param cacheRegistry the cache registry
      */
     public void setCacheRegistry(CacheRegistry cacheRegistry) {
@@ -38,6 +61,7 @@ public class Injector {
 
     /**
      * Gets the repository registry.
+     *
      * @return the repository registry
      */
     public RepositoryRegistry getRepositoryRegistry() {
@@ -46,6 +70,7 @@ public class Injector {
 
     /**
      * Gets the cache registry.
+     *
      * @return the cache registry
      */
     public CacheRegistry getCacheRegistry() {
@@ -63,14 +88,17 @@ public class Injector {
     @SuppressWarnings("unchecked")
     public <T extends EntityCommandHandler> T createInstance(Class<T> cls) {
         try {
-            Field entityRepoField = EntityCommandHandler.class.getDeclaredField("entityRepo");
+            Field entityRepoField = EntityHandler.class.getDeclaredField("entityRepo");
             entityRepoField.setAccessible(true);
 
-            Field repositoryRegistryField = EntityCommandHandler.class.getDeclaredField("repositoryRegistry");
+            Field repositoryRegistryField = EntityHandler.class.getDeclaredField("repositoryRegistry");
             repositoryRegistryField.setAccessible(true);
 
-            Field cacheRegistryField = EntityCommandHandler.class.getDeclaredField("cacheRegistry");
+            Field cacheRegistryField = EntityHandler.class.getDeclaredField("cacheRegistry");
             cacheRegistryField.setAccessible(true);
+
+            Field loggerField = EntityHandler.class.getDeclaredField("logger");
+            loggerField.setAccessible(true);
 
             T handler = cls.newInstance();
             Type genericFieldType = handler.getClass().getGenericSuperclass();
@@ -79,6 +107,8 @@ public class Injector {
             entityRepoField.set(handler, repositoryRegistry.getRepository(entityTypeClass));
             repositoryRegistryField.set(handler, repositoryRegistry);
             cacheRegistryField.set(handler, cacheRegistry);
+            loggerField.set(handler, logger.createSubLogger(entityTypeClass.getSimpleName(),
+                    entityTypeClass.getSimpleName()));
             return handler;
         } catch (NoSuchFieldException | IllegalAccessException | InstantiationException e) {
             throw new CommandException(e); // $COVERAGE-IGNORE$
@@ -88,20 +118,38 @@ public class Injector {
     /**
      * This creates an instance of a {@link EntityEventHandler} injected the {@link EntityRepository} as it
      * repository.
+     *
      * @param cls the {@link EntityEventHandler} type for creating new instance.
-     * @param repo  the repository to be injected to the {@link EntityEventHandler}.
      * @param <T> the {@link EntityEventHandler} type for creating new instance.
      * @return the created {@link EntityEventHandler}
      */
-    public <T extends EntityEventHandler> T createListenerInstance(Class<T> cls, EntityRepository repo) {
+    @SuppressWarnings("unchecked")
+    public <T extends EntityEventHandler> T createListenerInstance(Class<T> cls) {
         try {
-            Field field = cls.getSuperclass().getDeclaredField("entityRepo");
-            field.setAccessible(true);
+            Field entityRepoField = EntityHandler.class.getDeclaredField("entityRepo");
+            entityRepoField.setAccessible(true);
+
+            Field repositoryRegistryField = EntityHandler.class.getDeclaredField("repositoryRegistry");
+            repositoryRegistryField.setAccessible(true);
+
+            Field cacheRegistryField = EntityHandler.class.getDeclaredField("cacheRegistry");
+            cacheRegistryField.setAccessible(true);
+
+            Field loggerField = EntityHandler.class.getDeclaredField("logger");
+            loggerField.setAccessible(true);
+
             T handler = cls.newInstance();
-            field.set(handler, repo);
+            Type genericFieldType = handler.getClass().getGenericSuperclass();
+            ParameterizedType type = (ParameterizedType) genericFieldType;
+            Class entityTypeClass = (Class) type.getActualTypeArguments()[1];
+            entityRepoField.set(handler, repositoryRegistry.getRepository(entityTypeClass));
+            repositoryRegistryField.set(handler, repositoryRegistry);
+            cacheRegistryField.set(handler, cacheRegistry);
+            loggerField.set(handler, logger.createSubLogger(entityTypeClass.getSimpleName(),
+                    entityTypeClass.getSimpleName()));
             return handler;
         } catch (NoSuchFieldException | IllegalAccessException | InstantiationException e) {
-            throw new EventException(e);
+            throw new EventException(e); // $COVERAGE-IGNORE$
         }
     }
 }

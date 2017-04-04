@@ -1,0 +1,10 @@
+Command RegisterUser<RegisterStatus> : This represents a user of the system {
+    String userId       : user identifier
+    String email       : user identifier
+	invalid line
+    Response RegisterStatus : Ayyoooooo {
+		String userId       : user identifier
+		String email        : user identifier
+	}
+}
+==== no/file
