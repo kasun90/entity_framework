@@ -1,5 +1,6 @@
 package com.ust.storage;
 
+import com.ust.common.GsonCodec;
 import com.ust.storage.view.EventView;
 import java.io.UnsupportedEncodingException;
 import org.rocksdb.RocksIterator;

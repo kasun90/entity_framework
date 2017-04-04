@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.ust.spi.test;
 
 import com.ust.spi.*;
@@ -78,15 +73,10 @@ public class SpiTest {
         Assert.assertEquals(1, mapEntity.getItems().size());
     }
 
-    @Test
+    @Test(expected = EntityException.class)
     public void mapEntityExceptionTest() {
         TestMapEntity mapEntity = new TestMapEntity();
-        try {
-            mapEntity.applyEvent("1", new EntityExceptionCreationEvent());
-            Assert.fail();
-        } catch (Throwable ex) {
-            Assert.assertEquals(EntityException.class, ex.getClass());
-        }
+        mapEntity.applyEvent("1", new EntityExceptionCreationEvent());
     }
 
     @Test(expected = EntityException.class)
@@ -127,9 +117,11 @@ public class SpiTest {
     @Test
     public void viewRepositoryGetTest() throws Exception {
         UserRegisterRequest request = new UserRegisterRequest("nuwan", "ust123");
-        RegisterUser registerUser = injector.createInstance(RegisterUser.class);
+        RegisterUser registerUser = injector.createInstance(RegisterUser.class
+        );
         UserResponse response = registerUser.execute(request);
-        User user = injector.getRepositoryRegistry().getRepository(User.class).getEntity("nuwan");
+        User user = injector.getRepositoryRegistry().getRepository(User.class
+        ).getEntity("nuwan");
 
         Assert.assertEquals(1, user.getEventsCount());
         Assert.assertEquals("nuwan", response.getError());
@@ -140,9 +132,11 @@ public class SpiTest {
     @Test
     public void user_create_command_test() throws Exception {
         UserRegisterRequest request = new UserRegisterRequest("nuwan", "ust123");
-        RegisterUser registerUser = injector.createInstance(RegisterUser.class);
+        RegisterUser registerUser = injector.createInstance(RegisterUser.class
+        );
         UserResponse response = registerUser.execute(request);
-        User user = injector.getRepositoryRegistry().getRepository(User.class).getEntity("nuwan");
+        User user = injector.getRepositoryRegistry().getRepository(User.class
+        ).getEntity("nuwan");
 
         Assert.assertEquals(1, user.getEventsCount());
         Assert.assertEquals("nuwan", response.getError());
@@ -153,15 +147,18 @@ public class SpiTest {
     @Test
     public void user_password_change_command_test() throws Exception {
         User user = given_user("nuwan", "ust123");
-        EntityRepository<User> repository = injector.getRepositoryRegistry().getRepository(User.class);
+        EntityRepository<User> repository = injector.getRepositoryRegistry().getRepository(User.class
+        );
         repository.saveEntity(user);
         PasswordResetRequest request = new PasswordResetRequest("nuwan", "nuwan123");
-        ResetPassword resetPassword = injector.createInstance(ResetPassword.class);
+        ResetPassword resetPassword = injector.createInstance(ResetPassword.class
+        );
         UserResponse response = resetPassword.execute(request);
 
         Assert.assertEquals("", response.getError());
         Assert.assertEquals("nuwan", user.getUsername());
         Assert.assertEquals("nuwan123", user.getPassword());
+
     }
 
     public static class ownCacheTestClass1 extends EntityCommandHandler<UserRegisterRequest, UserResponse, User> {
@@ -192,9 +189,12 @@ public class SpiTest {
     public void ownCacheTest() throws Exception {
         InMemoryCacheRegistry reg = new InMemoryCacheRegistry();
 
-        EntityCommandHandler<UserRegisterRequest, UserResponse, User> resetPassword = injector.createInstance(ownCacheTestClass1.class);
+        EntityCommandHandler<UserRegisterRequest, UserResponse, User> resetPassword = injector.createInstance(ownCacheTestClass1.class
+        );
         resetPassword.execute(new UserRegisterRequest("test", "best"));
-        resetPassword = injector.createInstance(ownCacheTestClass2.class);
+        resetPassword
+            = injector.createInstance(ownCacheTestClass2.class
+            );
         resetPassword.execute(new UserRegisterRequest("test", "best"));
     }
 }

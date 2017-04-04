@@ -1,5 +1,6 @@
 package com.ust.storage;
 
+import com.ust.common.GsonCodec;
 import com.ust.storage.ex.EntityCompatibilityException;
 import com.ust.storage.ex.EntityViewException;
 import com.ust.storage.view.EntityView;

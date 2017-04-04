@@ -13,8 +13,8 @@ public class JsonHelper {
         Iterable<JsonObject> iterable = () -> jsonIterator;
         return StreamSupport.stream(iterable.spliterator(), false);
     }
-    
-    public static  boolean eq(JsonElement el, Object value) {
+
+    public static boolean eq(JsonElement el, Object value) {
         if (el == null && value == null) {
             return true;
         }
@@ -27,13 +27,32 @@ public class JsonHelper {
         } else if (el.isJsonPrimitive()) {
             return el.getAsString().equals(String.valueOf(value));
         } else if (el.isJsonObject() && (value instanceof JsonObject)) {
-                return el.getAsJsonObject().toString().equals(((JsonObject) value).toString());
+            return el.getAsJsonObject().toString().equals(((JsonObject) value).toString());
         }
         return false;
     }
-    
+
+//    public static boolean gt(JsonElement el, Object value) {
+//        if (el == null && value == null) {
+//            return true;
+//        }
+//        if (el == null || value == null) {
+//            return false;
+//        }
+//        if (el.isJsonNull()) {
+//            return false;
+//        }
+//        else if(el.isJsonPrimitive())
+//        {
+//            if(el.getAsJsonPrimitive().isNumber())
+//                return new BigDecimal(el.getAsString()).compareTo(new BigDecimal(String.valueOf(value))) > 0;
+//            else
+//                
+//        }
+//    }
+
     @SuppressWarnings("PMD")
-     public static int compare(JsonElement left, JsonElement right) {
+    public static int compare(JsonElement left, JsonElement right) {
         if (left == null && right == null) {
             return 0;
         }
@@ -62,7 +81,7 @@ public class JsonHelper {
                 return left.getAsString().compareTo(right.getAsString());
             }
         } else {
-            return  left.toString().compareTo(right.toString());
+            return left.toString().compareTo(right.toString());
         }
     }
 }

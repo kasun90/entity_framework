@@ -1,4 +1,4 @@
-package com.ust.storage;
+package com.ust.common;
 
 import com.google.gson.Gson;
 
