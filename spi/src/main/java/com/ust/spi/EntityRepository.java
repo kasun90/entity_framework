@@ -9,7 +9,7 @@ package com.ust.spi;
 public abstract class EntityRepository<E extends Entity> implements EntityViewRepository<E> {
 
     /**
-     * Sage the changes to the {@link Entity} server.
+     * Save the changes to the {@link Entity} server.
      *
      * @param entity the {@link Entity} to be saved
      */

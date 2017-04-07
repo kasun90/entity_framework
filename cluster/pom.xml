@@ -51,5 +51,10 @@
             <artifactId>zero-allocation-hashing</artifactId>
             <version>0.6</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>spi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 </project>

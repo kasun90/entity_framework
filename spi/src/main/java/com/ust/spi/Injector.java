@@ -19,7 +19,7 @@ public class Injector {
 
     public Injector(RepositoryRegistry repositoryRegistry, CacheRegistry cacheRegistry, Logger logger) {
         setRepositoryRegistry(repositoryRegistry);
-        setCacheRegistry(this.cacheRegistry = cacheRegistry);
+        setCacheRegistry(cacheRegistry);
         setLogger(logger);
     }
 
@@ -37,7 +37,7 @@ public class Injector {
      *
      * @param logger the logger
      */
-    public void setLogger(Logger logger) {
+    public final void setLogger(Logger logger) {
         this.logger = logger;
     }
 
@@ -46,7 +46,7 @@ public class Injector {
      *
      * @param repositoryRegistry the repository registry
      */
-    public void setRepositoryRegistry(RepositoryRegistry repositoryRegistry) {
+    public final void setRepositoryRegistry(RepositoryRegistry repositoryRegistry) {
         this.repositoryRegistry = repositoryRegistry;
     }
 
@@ -55,7 +55,7 @@ public class Injector {
      *
      * @param cacheRegistry the cache registry
      */
-    public void setCacheRegistry(CacheRegistry cacheRegistry) {
+    public final void setCacheRegistry(CacheRegistry cacheRegistry) {
         this.cacheRegistry = cacheRegistry;
     }
 

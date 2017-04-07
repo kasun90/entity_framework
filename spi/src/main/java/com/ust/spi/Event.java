@@ -7,7 +7,7 @@ package com.ust.spi;
 public abstract class Event {
 
     private String entityId;
-    private long time;
+    private final long time;
 
     public Event() {
         this.time = System.currentTimeMillis();
